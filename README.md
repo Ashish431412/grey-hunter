@@ -4,6 +4,18 @@
 
 ---
 
+## 📥 Downloadable PDF Documentation & Field Manuals
+
+Instant access to publication-grade, offline-ready PDF documentation directly from this repository:
+
+| Document | Format | Description | Direct Download |
+| :--- | :--- | :--- | :--- |
+| **System Architecture & Implementation Plan** | PDF (Vector) | 6-Phase technical architecture, cryptographic identity, sandboxing, and compliance roadmap. | [📥 **Download Implementation Plan PDF**](./GREY_HUNTER_IMPLEMENTATION_PLAN.pdf) |
+| **Complete Cybersecurity Tool Manuals Handbook** | PDF (Vector) | Exhaustive field manual covering 22+ security tools with commands, flags, packet mechanics, and defense playbooks. | [📥 **Download Field Manuals PDF**](./GREY_HUNTER_COMPLETE_TOOL_MANUALS.pdf) |
+| **Executive Security Audit & Vulnerability Report** | PDF (Vector) | Sample executive security assessment report featuring CVSS 3.1 threat scoring, attack surface, and remediations. | [📥 **Download Security Audit Report PDF**](./GREY_HUNTER_SECURITY_AUDIT_REPORT.pdf) |
+
+---
+
 ## 🌟 Key Features
 
 ### 📱 1. Mobile Application (`/mobile`)
