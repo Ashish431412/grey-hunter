@@ -106,6 +106,13 @@ export const LoginScreen = ({ navigation }: any) => {
           <Text style={styles.biometricText}>[ USE BIOMETRICS / QUICK ACCESS ]</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity 
+          style={styles.registerButton} 
+          onPress={() => navigation.navigate('RegisterScreen')}
+        >
+          <Text style={styles.registerButtonText}>[+ CREATE NEW ACCOUNT / REGISTER ]</Text>
+        </TouchableOpacity>
+
         <View style={styles.footer}>
           <TouchableOpacity onPress={() => navigation.navigate('EthicsAgreementScreen')}>
             <Text style={styles.linkText}>RULES_OF_ENGAGEMENT</Text>
@@ -177,15 +184,33 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   biometricButton: {
-    padding: 15,
+    padding: 13,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: THEME.accent,
-    marginBottom: 40,
+    marginBottom: 12,
+    backgroundColor: 'rgba(0, 212, 255, 0.05)',
   },
   biometricText: {
     color: THEME.accent,
     fontFamily: 'monospace',
+    fontSize: 13,
+    letterSpacing: 1,
+  },
+  registerButton: {
+    padding: 14,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: THEME.primary,
+    marginBottom: 28,
+    backgroundColor: 'rgba(0, 255, 102, 0.08)',
+  },
+  registerButtonText: {
+    color: THEME.primary,
+    fontFamily: 'monospace',
+    fontWeight: 'bold',
+    fontSize: 13,
+    letterSpacing: 1,
   },
   footer: {
     alignItems: 'center',

@@ -717,5 +717,138 @@
     "parameters": [
       { "name": "hash", "type": "string", "description": "Hash string to identify", "required": true }
     ]
+  },
+  {
+    "id": "netdiscover",
+    "name": "Netdiscover",
+    "category": "Network",
+    "description": "Active/passive ARP reconnaissance tool for finding live hosts, IP addresses, and MAC hardware vendors on local wireless or Ethernet networks.",
+    "command": "netdiscover",
+    "requiresRoot": true,
+    "requiresNetwork": true,
+    "icon": "search",
+    "docLink": "docs/tools/netdiscover",
+    "parameters": [
+      { "name": "range", "type": "string", "description": "Scan a given range (-r e.g. 192.168.1.0/24)", "required": false },
+      { "name": "interface", "type": "string", "description": "Network interface to use (-i wlan0, eth0)", "required": false },
+      { "name": "passive", "type": "boolean", "description": "Passive sniff mode without sending packets (-p)", "required": false, "default": false },
+      { "name": "fast", "type": "boolean", "description": "Fast mode scan (-F)", "required": false, "default": false }
+    ]
+  },
+  {
+    "id": "netscan",
+    "name": "Netscan (Ping & Port Sweep)",
+    "category": "Network",
+    "description": "Multi-threaded subnet range scanner and TCP connect sweeper for rapid live node inventory and host discovery.",
+    "command": "netscan",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "wifi",
+    "docLink": "docs/tools/netscan",
+    "parameters": [
+      { "name": "subnet", "type": "string", "description": "Target subnet (e.g. 192.168.1.0/24)", "required": true },
+      { "name": "threads", "type": "number", "description": "Concurrent thread workers (-t)", "required": false, "default": 20 },
+      { "name": "timeout", "type": "number", "description": "Ping timeout in ms", "required": false, "default": 500 }
+    ]
+  },
+  {
+    "id": "amass",
+    "name": "OWASP Amass",
+    "category": "Recon",
+    "description": "In-depth attack surface mapping and external asset discovery using open source intelligence (OSINT) and active reconnaissance.",
+    "command": "amass",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "globe-outline",
+    "docLink": "docs/tools/amass",
+    "parameters": [
+      { "name": "domain", "type": "string", "description": "Target domain (-d example.com)", "required": true },
+      { "name": "mode", "type": "enum", "description": "Execution mode", "required": false, "default": "enum", "options": ["enum", "intel", "track", "viz"] },
+      { "name": "active", "type": "boolean", "description": "Active reconnaissance (-active)", "required": false, "default": false },
+      { "name": "brute", "type": "boolean", "description": "Brute force subdomains (-brute)", "required": false, "default": false }
+    ]
+  },
+  {
+    "id": "subfinder",
+    "name": "Subfinder",
+    "category": "Recon",
+    "description": "Fast passive subdomain discovery tool that searches across multiple passive online sources without sending traffic directly to the target.",
+    "command": "subfinder",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "telescope",
+    "docLink": "docs/tools/subfinder",
+    "parameters": [
+      { "name": "domain", "type": "string", "description": "Target domain (-d example.com)", "required": true },
+      { "name": "silent", "type": "boolean", "description": "Show only subdomains found (-silent)", "required": false, "default": true },
+      { "name": "all", "type": "boolean", "description": "Use all sources (-all)", "required": false, "default": false }
+    ]
+  },
+  {
+    "id": "nuclei",
+    "name": "Nuclei",
+    "category": "Web",
+    "description": "Fast and customizable vulnerability scanner based on simple YAML templates for web, network, and cloud security assessments.",
+    "command": "nuclei",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "shield-checkmark-outline",
+    "docLink": "docs/tools/nuclei",
+    "parameters": [
+      { "name": "target", "type": "string", "description": "Target URL or host (-u https://example.com)", "required": true },
+      { "name": "severity", "type": "enum", "description": "Filter template severity (-s)", "required": false, "default": "critical,high,medium", "options": ["critical", "high", "medium", "low", "info", "critical,high,medium"] },
+      { "name": "tags", "type": "string", "description": "Template tags to execute (-tags cve,auth,misconfig)", "required": false },
+      { "name": "rateLimit", "type": "number", "description": "Maximum requests per second (-rl)", "required": false, "default": 50 }
+    ]
+  },
+  {
+    "id": "wpscan",
+    "name": "WPScan",
+    "category": "Web",
+    "description": "Black box WordPress vulnerability scanner for security assessments of WordPress core, plugins, and theme components.",
+    "command": "wpscan",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "logo-wordpress",
+    "docLink": "docs/tools/wpscan",
+    "parameters": [
+      { "name": "url", "type": "string", "description": "Target WordPress site URL (--url https://example.com)", "required": true },
+      { "name": "enumerate", "type": "enum", "description": "Enumeration options (-e)", "required": false, "default": "vp,vt,u", "options": ["vp,vt,u", "ap,at", "cb,dbe", "u"] },
+      { "name": "detectionMode", "type": "enum", "description": "Detection mode", "required": false, "default": "passive", "options": ["passive", "aggressive", "mixed"] },
+      { "name": "randomUserAgent", "type": "boolean", "description": "Use random user-agent (--random-user-agent)", "required": false, "default": true }
+    ]
+  },
+  {
+    "id": "rustscan",
+    "name": "RustScan",
+    "category": "Network",
+    "description": "Modern ultra-fast port scanner written in Rust that scans all 65,535 ports in under 3 seconds and pipes results automatically into Nmap.",
+    "command": "rustscan",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "speedometer-outline",
+    "docLink": "docs/tools/rustscan",
+    "parameters": [
+      { "name": "addresses", "type": "string", "description": "Target IP address or CIDR (-a 192.168.1.1)", "required": true },
+      { "name": "batchSize", "type": "number", "description": "Batch size for SYN packets (-b)", "required": false, "default": 4500 },
+      { "name": "timeout", "type": "number", "description": "Timeout in milliseconds (-t)", "required": false, "default": 1500 },
+      { "name": "range", "type": "string", "description": "Port range (-r 1-65535)", "required": false, "default": "1-65535" }
+    ]
+  },
+  {
+    "id": "trufflehog",
+    "name": "TruffleHog",
+    "category": "Audit",
+    "description": "Finds exposed secrets, leaked API keys, database credentials, and high-entropy private keys in git repositories and filesystems.",
+    "command": "trufflehog",
+    "requiresRoot": false,
+    "requiresNetwork": false,
+    "icon": "key",
+    "docLink": "docs/tools/trufflehog",
+    "parameters": [
+      { "name": "target", "type": "string", "description": "Target repo URL, directory path, or S3 bucket", "required": true },
+      { "name": "scanType", "type": "enum", "description": "Scan source type", "required": false, "default": "git", "options": ["git", "filesystem", "s3", "github"] },
+      { "name": "onlyVerified", "type": "boolean", "description": "Only return verified live keys (--only-verified)", "required": false, "default": false }
+    ]
   }
 ]

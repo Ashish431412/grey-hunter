@@ -554,6 +554,213 @@ export const TOOL_DOCS: ToolDoc[] = [
     defenseTips:
       'Segment internal corporate networks using Virtual LANs (VLANs) and internal firewalls so compromised devices cannot move laterally across subnets.',
   },
+  {
+    id: 'amass',
+    name: 'OWASP Amass',
+    title: 'OWASP Amass // Attack Surface Mapping',
+    category: 'NETWORK',
+    badge: 'OSINT_RECON',
+    readTime: '4 min read',
+    oneLiner: 'Map your complete external attack surface, subdomains, and network infrastructure using OSINT.',
+    overview:
+      'OWASP Amass performs extensive external asset discovery and network infrastructure mapping. It aggregates intelligence from hundreds of public sources, DNS records, certificate transparency logs, and routing databases to give security teams a comprehensive view of their external attack surface.',
+    whyUse:
+      'Organizations often lose track of legacy subdomains, abandoned cloud assets, and unmonitored test servers. Amass discovers these forgotten endpoints before attackers can locate and exploit them.',
+    howItWorks:
+      'Amass combines passive data collection (scraping DNS datasets, Shodan, Censys, VirusTotal, crt.sh) with active DNS resolution, reverse IP lookups, and autonomous system (ASN) routing analysis to construct an interconnected graph of the organization’s assets.',
+    flags: [
+      { flag: 'enum', syntax: 'amass enum -d <domain>', desc: 'Subdomain Enumeration. Discovers all subdomains tied to the root domain.' },
+      { flag: '-active', syntax: 'amass enum -active -d <domain>', desc: 'Active Probing. Resolves discovered names and checks TLS certificates directly.' },
+      { flag: '-brute', syntax: 'amass enum -brute -d <domain>', desc: 'Brute Force. Uses wordlists to guess valid subdomains.' },
+      { flag: 'intel', syntax: 'amass intel -whois -d <domain>', desc: 'Intelligence Gathering. Discovers additional root domains owned by the organization.' },
+      { flag: '-o', syntax: 'amass enum -d <domain> -o <file.txt>', desc: 'Output File. Saves all discovered hosts into a text file.' },
+    ],
+    commands: [
+      {
+        cmd: 'amass enum -passive -d example.com',
+        desc: 'Perform a 100% passive subdomain scan without sending any traffic to the target.',
+        exampleOutput: 'api.example.com\nportal.example.com\nstaging.example.com\nvpn.example.com\n[✓] 24 subdomains discovered.',
+      },
+      {
+        cmd: 'amass enum -active -d example.com -p 80,443',
+        desc: 'Enumerate subdomains and verify live HTTP/HTTPS services.',
+        exampleOutput: 'admin.example.com (IP: 198.51.100.12)\nmail.example.com  (IP: 198.51.100.25)',
+      },
+    ],
+    defenseTips:
+      'Conduct regular attack surface audits. Decommission unused subdomains immediately to avoid Subdomain Takeover attacks, and restrict DNS zone transfers (AXFR).',
+    relatedToolId: 'amass',
+  },
+  {
+    id: 'subfinder',
+    name: 'Subfinder',
+    title: 'Subfinder // Fast Passive Subdomain Finder',
+    category: 'WEB',
+    badge: 'SUBDOMAIN_FINDER',
+    readTime: '2 min read',
+    oneLiner: 'High-speed passive subdomain discovery designed for bug bounty hunters and penetration testers.',
+    overview:
+      'Subfinder is an ultra-fast, passive reconnaissance tool developed by ProjectDiscovery. It queries dozens of passive sources (like certificate logs, security search engines, and web archives) to return valid subdomains in seconds without touching the target server.',
+    whyUse:
+      'When speed and stealth are critical, Subfinder returns hundreds of subdomains within 5 seconds without triggering target alarms or Web Application Firewalls (WAF).',
+    howItWorks:
+      'Subfinder communicates with external search API feeds concurrently. Because all requests go to public search engines and certificate transparency logs (e.g. crt.sh, Censys), the target receives zero packets from your IP.',
+    flags: [
+      { flag: '-d', syntax: 'subfinder -d <domain>', desc: 'Domain. Specifies target domain for subdomain enumeration.' },
+      { flag: '-silent', syntax: 'subfinder -d <domain> -silent', desc: 'Silent Mode. Prints only clean subdomains without banners for easy shell piping.' },
+      { flag: '-all', syntax: 'subfinder -d <domain> -all', desc: 'Use All Sources. Queries slower and deeper passive search feeds.' },
+      { flag: '-o', syntax: 'subfinder -d <domain> -o subdomains.txt', desc: 'Output File. Saves results to specified text file.' },
+    ],
+    commands: [
+      {
+        cmd: 'subfinder -d target.com -silent',
+        desc: 'Quickly output all discovered subdomains to terminal.',
+        exampleOutput: 'dev.target.com\napi-v2.target.com\nauth.target.com\ngit.target.com',
+      },
+      {
+        cmd: 'subfinder -d target.com -silent | httpx -title',
+        desc: 'Pipe subdomains directly into HTTP prober to check web titles and status codes.',
+        exampleOutput: 'https://auth.target.com [200 OK] [Single Sign-On]\nhttps://git.target.com [403 Forbidden]',
+      },
+    ],
+    defenseTips:
+      'Implement Wildcard DNS cautiously. Monitor Certificate Transparency (CT) logs to receive instant alerts when unauthorized SSL certificates are generated for your domains.',
+    relatedToolId: 'subfinder',
+  },
+  {
+    id: 'nuclei',
+    name: 'Nuclei',
+    title: 'Nuclei // Template-Based Vulnerability Scanner',
+    category: 'WEB',
+    badge: 'VULN_SCANNER',
+    readTime: '4 min read',
+    oneLiner: 'Fast, community-driven vulnerability scanner based on clear, reproducible YAML templates.',
+    overview:
+      'Nuclei is an open-source vulnerability scanner that uses simple YAML-based templates to detect security flaws, CVEs, misconfigurations, and credential exposures across web applications, cloud assets, and networks.',
+    whyUse:
+      'Traditional vulnerability scanners can be slow, noisy, and prone to false positives. Nuclei templates are transparent, precise, customizable, and maintained by thousands of security researchers worldwide.',
+    howItWorks:
+      'Each YAML template defines exact HTTP, DNS, TCP, or SSL requests and specifies string or regex extractors to confirm vulnerabilities. Nuclei executes thousands of templates concurrently with zero false positive fuzzing overhead.',
+    flags: [
+      { flag: '-u', syntax: 'nuclei -u <url>', desc: 'Target URL. Single URL or IP host to scan.' },
+      { flag: '-l', syntax: 'nuclei -l <list.txt>', desc: 'Target List. Text file containing list of target URLs.' },
+      { flag: '-t', syntax: 'nuclei -t <templates/>', desc: 'Template Directory. Custom templates or specific CVE directories.' },
+      { flag: '-s', syntax: 'nuclei -s critical,high', desc: 'Severity Filter. Runs only templates matching selected severity levels.' },
+      { flag: '-tags', syntax: 'nuclei -tags cve,auth,lfi', desc: 'Tag Filter. Executes templates matching specific vulnerability categories.' },
+    ],
+    commands: [
+      {
+        cmd: 'nuclei -u https://example.com -s critical,high',
+        desc: 'Scan website for Critical and High severity vulnerabilities only.',
+        exampleOutput: '[CVE-2021-41773] [http] [critical] https://example.com/icons/.%%32%65/etc/passwd\n[waf-detect] [http] [info] Cloudflare Detected',
+      },
+      {
+        cmd: 'nuclei -u https://example.com -tags misconfig,exposure',
+        desc: 'Audit for exposed .env files, backup archives, and configuration leaks.',
+        exampleOutput: '[git-config-exposure] [http] [medium] https://example.com/.git/config',
+      },
+    ],
+    defenseTips:
+      'Run Nuclei scans automatically in CI/CD deployment pipelines to catch known CVEs and sensitive file exposures before code reaches production.',
+    relatedToolId: 'nuclei',
+  },
+  {
+    id: 'wpscan',
+    name: 'WPScan',
+    title: 'WPScan // WordPress Security Auditor',
+    category: 'WEB',
+    badge: 'CMS_AUDIT',
+    readTime: '3 min read',
+    oneLiner: 'Black box security scanner to audit WordPress core, plugins, themes, and usernames for vulnerabilities.',
+    overview:
+      'Over 40% of websites run on WordPress. WPScan is the specialized vulnerability scanner that audits WordPress installations, catalogs installed plugins and themes, and correlates them against the WPScan Vulnerability Database.',
+    whyUse:
+      'Most WordPress breaches occur through unpatched third-party plugins. WPScan detects outdated plugins with known remote code execution (RCE) or SQL injection vulnerabilities within minutes.',
+    howItWorks:
+      'WPScan analyzes HTML sources, style references, readmes, and known file paths to detect the exact version numbers of WordPress and every active plugin, then queries its vulnerability database for matching CVEs.',
+    flags: [
+      { flag: '--url', syntax: 'wpscan --url <site>', desc: 'Target URL. The WordPress website to scan.' },
+      { flag: '-e vp', syntax: 'wpscan -e vp', desc: 'Enumerate Vulnerable Plugins. Checks plugins against known security advisories.' },
+      { flag: '-e u', syntax: 'wpscan -e u', desc: 'Enumerate Users. Identifies author usernames via author archives and REST API.' },
+      { flag: '--random-user-agent', syntax: 'wpscan --random-user-agent', desc: 'User Agent. Uses a random browser User-Agent header.' },
+    ],
+    commands: [
+      {
+        cmd: 'wpscan --url https://example.com -e vp,vt',
+        desc: 'Scan for vulnerable plugins and themes on the target WordPress site.',
+        exampleOutput: '[i] WordPress version 6.2 identified\n[!] Plugin "elementor" v3.12.0 is vulnerable to CVE-2023-32243 (Broken Access Control)',
+      },
+      {
+        cmd: 'wpscan --url https://example.com -e u',
+        desc: 'Enumerate exposed administrative and author usernames.',
+        exampleOutput: '[+] Identified Usernames: [1] admin, [2] webmaster, [3] author_john',
+      },
+    ],
+    defenseTips:
+      'Disable the WordPress REST API users endpoint (/wp-json/wp/v2/users), keep all plugins updated automatically, and enforce Multi-Factor Authentication (2FA) for all admin accounts.',
+    relatedToolId: 'wpscan',
+  },
+  {
+    id: 'rustscan',
+    name: 'RustScan',
+    title: 'RustScan // Modern Lightning Port Scanner',
+    category: 'NETWORK',
+    badge: 'PORT_SCANNER',
+    readTime: '2 min read',
+    oneLiner: 'Blazing fast port scanner written in Rust that scans 65,535 ports in 3 seconds.',
+    overview:
+      'RustScan is a modern port scanner that leverages Rust’s asynchronous concurrency to scan all 65,535 ports across an entire IP in less than 3 seconds. Once it finds open ports, it automatically passes them directly into Nmap for deep service versioning and script inspection.',
+    whyUse:
+      'Scanning all 65,535 ports with traditional tools can take 15 to 30 minutes. RustScan does it in 3 seconds, saving penetration testers valuable time during engagements.',
+    howItWorks:
+      'RustScan utilizes an adaptive socket scanning algorithm that dynamically scales concurrency based on network latency and error rates. Once open ports are detected, it invokes Nmap with `-p <ports>` to perform deep fingerprinting.',
+    flags: [
+      { flag: '-a', syntax: 'rustscan -a <target>', desc: 'Addresses. Target IP address or comma-separated list of IPs.' },
+      { flag: '-r', syntax: 'rustscan -r 1-65535', desc: 'Range. Port range to scan.' },
+      { flag: '-b', syntax: 'rustscan -b 4500', desc: 'Batch Size. Number of concurrent sockets per batch.' },
+      { flag: '--', syntax: 'rustscan -a <ip> -- -sC -sV', desc: 'Nmap Pass-Through. Passes arguments directly into Nmap once ports are found.' },
+    ],
+    commands: [
+      {
+        cmd: 'rustscan -a 192.168.1.100 -- -sV',
+        desc: 'Quickly scan all 65,535 ports and run Nmap service version detection on open ports.',
+        exampleOutput: '[~] Starting RustScan 2.1.1\n[+] Open ports: [22, 80, 443, 8080]\n[~] Executing Nmap on open ports...\nPORT     STATE SERVICE VERSION\n22/tcp   open  ssh     OpenSSH 8.9\n80/tcp   open  http    nginx 1.22.0',
+      },
+    ],
+    defenseTips:
+      'Monitor firewall connection rates. Configure SYN flood and port scan detection in firewalls to automatically ban IPs that initiate hundreds of connections per second.',
+    relatedToolId: 'rustscan',
+  },
+  {
+    id: 'trufflehog',
+    name: 'TruffleHog',
+    title: 'TruffleHog // Secrets & Key Leak Detector',
+    category: 'REFERENCE',
+    badge: 'SECRET_SCAN',
+    readTime: '3 min read',
+    oneLiner: 'Find leaked API keys, passwords, private keys, and database credentials across repos and files.',
+    overview:
+      'TruffleHog scans Git commit history, file directories, and cloud buckets to uncover hardcoded credentials, secret keys, AWS tokens, SSH private keys, and database credentials before malicious actors can find and exploit them.',
+    whyUse:
+      'Accidentally committing `.env` files or hardcoding AWS credentials in source code is one of the leading causes of cloud breaches. TruffleHog finds these leaks and verifies if they are live.',
+    howItWorks:
+      'TruffleHog employs Shannon entropy algorithms combined with over 700 custom regex detectors for specific provider token patterns (AWS, GitHub, Google Cloud, Stripe, Slack). It can also perform live verification against provider APIs to confirm if a token is active.',
+    flags: [
+      { flag: 'git', syntax: 'trufflehog git <repo-url>', desc: 'Git Repo Scan. Scans entire commit history of a remote Git repository.' },
+      { flag: 'filesystem', syntax: 'trufflehog filesystem <path>', desc: 'Local Filesystem. Scans local folders, source code, and configuration files.' },
+      { flag: '--only-verified', syntax: 'trufflehog --only-verified', desc: 'Verified Keys. Only outputs credentials verified as currently active against provider APIs.' },
+    ],
+    commands: [
+      {
+        cmd: 'trufflehog filesystem ./src --only-verified',
+        desc: 'Scan current project source code and report any active leaked secrets.',
+        exampleOutput: '🐷 Found verified secret!\nDetector Type: GitHub Personal Access Token\nRaw: ghp_xxxxxxxxxxxxxxxxxxxx\nCommit: 4a2b9c1 (Merge branch dev)',
+      },
+    ],
+    defenseTips:
+      'Implement pre-commit hooks (like GitGuardian or TruffleHog pre-commit) to block code containing secrets from ever being committed to source control repositories.',
+    relatedToolId: 'trufflehog',
+  },
 ];
 
 export const getDocById = (docId: string): ToolDoc | undefined => {

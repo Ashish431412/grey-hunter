@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AuthStackParamList } from './types';
 import { useTheme } from '../theme';
 import { LoginScreen } from '../../screens/auth/LoginScreen';
+import { RegisterScreen } from '../../screens/auth/RegisterScreen';
 import { BiometricSetupScreen } from '../../screens/auth/BiometricSetupScreen';
 import { EthicsAgreementScreen } from '../../screens/auth/EthicsAgreementScreen';
 
@@ -19,6 +20,7 @@ export const AuthStack = () => {
       }}
     >
       <Stack.Screen name="LoginScreen" component={LoginScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="RegisterScreen" component={RegisterScreen} options={{ headerShown: false }} />
       <Stack.Screen name="BiometricSetupScreen" component={BiometricSetupScreen} options={{ title: 'Security Setup' }} />
       <Stack.Screen name="EthicsAgreementScreen" component={EthicsAgreementScreen} options={{ title: 'Rules of Engagement' }} />
     </Stack.Navigator>

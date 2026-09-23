@@ -4,6 +4,7 @@ import { Project, Task, Tool } from '@utils/types';
 // Auth Stack
 export type AuthStackParamList = {
   LoginScreen: undefined;
+  RegisterScreen: undefined;
   BiometricSetupScreen: undefined;
   EthicsAgreementScreen: undefined;
 };
