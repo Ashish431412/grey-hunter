@@ -1,0 +1,721 @@
+[
+  {
+    "id": "nmap",
+    "name": "Nmap",
+    "category": "Network",
+    "description": "Network exploration tool and security/port scanner. The gold standard for network discovery and security auditing.",
+    "command": "nmap",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "radar",
+    "docLink": "docs/tools/nmap",
+    "parameters": [
+      { "name": "target", "type": "string", "description": "Target IP, hostname, or CIDR range", "required": true },
+      { "name": "ports", "type": "string", "description": "Port range to scan (-p)", "required": false },
+      { "name": "scanType", "type": "enum", "description": "Scan technique", "required": false, "default": "-sS", "options": ["-sS", "-sT", "-sU", "-sA", "-sW", "-sN"] },
+      { "name": "serviceVersion", "type": "boolean", "description": "Service version detection (-sV)", "required": false, "default": false },
+      { "name": "osDetection", "type": "boolean", "description": "OS detection (-O)", "required": false, "default": false },
+      { "name": "aggressive", "type": "boolean", "description": "Aggressive scan (-A)", "required": false, "default": false },
+      { "name": "timing", "type": "enum", "description": "Timing template", "required": false, "default": "-T3", "options": ["-T0", "-T1", "-T2", "-T3", "-T4", "-T5"] },
+      { "name": "outputFormat", "type": "enum", "description": "Output format", "required": false, "default": "-oX", "options": ["-oN", "-oX", "-oG", "-oA"] },
+      { "name": "scripts", "type": "string", "description": "NSE scripts to run (--script)", "required": false }
+    ]
+  },
+  {
+    "id": "masscan",
+    "name": "Masscan",
+    "category": "Network",
+    "description": "TCP port scanner that can scan the entire Internet in under 5 minutes. Fastest port scanner available.",
+    "command": "masscan",
+    "requiresRoot": true,
+    "requiresNetwork": true,
+    "icon": "flash",
+    "docLink": "docs/tools/masscan",
+    "parameters": [
+      { "name": "target", "type": "string", "description": "Target IP range (CIDR)", "required": true },
+      { "name": "ports", "type": "string", "description": "Ports to scan (-p)", "required": true },
+      { "name": "rate", "type": "number", "description": "Packets per second (--rate)", "required": false, "default": 1000 },
+      { "name": "banners", "type": "boolean", "description": "Grab banners (--banners)", "required": false, "default": false }
+    ]
+  },
+  {
+    "id": "netcat",
+    "name": "Netcat",
+    "category": "Network",
+    "description": "Networking utility for reading/writing network connections. The 'Swiss Army knife' of networking.",
+    "command": "nc",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "swap-horizontal",
+    "docLink": "docs/tools/netcat",
+    "parameters": [
+      { "name": "target", "type": "string", "description": "Target host", "required": true },
+      { "name": "port", "type": "number", "description": "Target port", "required": true },
+      { "name": "listen", "type": "boolean", "description": "Listen mode (-l)", "required": false, "default": false },
+      { "name": "verbose", "type": "boolean", "description": "Verbose output (-v)", "required": false, "default": true },
+      { "name": "udp", "type": "boolean", "description": "UDP mode (-u)", "required": false, "default": false }
+    ]
+  },
+  {
+    "id": "hping3",
+    "name": "hping3",
+    "category": "Network",
+    "description": "TCP/IP packet assembler and analyzer. Advanced ping with protocol support.",
+    "command": "hping3",
+    "requiresRoot": true,
+    "requiresNetwork": true,
+    "icon": "pulse",
+    "docLink": "docs/tools/hping3",
+    "parameters": [
+      { "name": "target", "type": "string", "description": "Target host", "required": true },
+      { "name": "port", "type": "number", "description": "Target port (-p)", "required": false },
+      { "name": "mode", "type": "enum", "description": "Packet mode", "required": false, "default": "--syn", "options": ["--syn", "--ack", "--fin", "--push", "--rst", "--udp", "--icmp"] },
+      { "name": "count", "type": "number", "description": "Packet count (-c)", "required": false, "default": 5 },
+      { "name": "flood", "type": "boolean", "description": "Flood mode (--flood)", "required": false, "default": false }
+    ]
+  },
+  {
+    "id": "ping",
+    "name": "Ping",
+    "category": "Network",
+    "description": "Basic ICMP connectivity test tool. Verify host reachability and measure round-trip time.",
+    "command": "ping",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "wifi",
+    "docLink": "docs/tools/ping",
+    "parameters": [
+      { "name": "target", "type": "string", "description": "Target host or IP", "required": true },
+      { "name": "count", "type": "number", "description": "Number of pings (-c)", "required": false, "default": 4 },
+      { "name": "interval", "type": "number", "description": "Interval in seconds (-i)", "required": false, "default": 1 }
+    ]
+  },
+  {
+    "id": "traceroute",
+    "name": "Traceroute",
+    "category": "Network",
+    "description": "Trace the route packets take to a network host. Map network topology.",
+    "command": "traceroute",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "git-branch",
+    "docLink": "docs/tools/traceroute",
+    "parameters": [
+      { "name": "target", "type": "string", "description": "Target host", "required": true },
+      { "name": "maxHops", "type": "number", "description": "Maximum hops (-m)", "required": false, "default": 30 },
+      { "name": "tcp", "type": "boolean", "description": "Use TCP instead of UDP (-T)", "required": false, "default": false }
+    ]
+  },
+  {
+    "id": "arp-scan",
+    "name": "ARP Scan",
+    "category": "Network",
+    "description": "ARP scanner for local network discovery. Find all hosts on a LAN segment.",
+    "command": "arp-scan",
+    "requiresRoot": true,
+    "requiresNetwork": true,
+    "icon": "search",
+    "docLink": "docs/tools/arp-scan",
+    "parameters": [
+      { "name": "interface", "type": "string", "description": "Network interface (-I)", "required": false, "default": "wlan0" },
+      { "name": "localnet", "type": "boolean", "description": "Scan local network (-l)", "required": false, "default": true },
+      { "name": "target", "type": "string", "description": "Target range (optional)", "required": false }
+    ]
+  },
+  {
+    "id": "nikto",
+    "name": "Nikto",
+    "category": "Vulnerability",
+    "description": "Web server scanner that tests for dangerous files, outdated software, and configuration issues.",
+    "command": "nikto",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "bug",
+    "docLink": "docs/tools/nikto",
+    "parameters": [
+      { "name": "host", "type": "string", "description": "Target host (-h)", "required": true },
+      { "name": "port", "type": "number", "description": "Target port (-port)", "required": false, "default": 80 },
+      { "name": "ssl", "type": "boolean", "description": "Force SSL (-ssl)", "required": false, "default": false },
+      { "name": "tuning", "type": "string", "description": "Scan tuning (-Tuning)", "required": false },
+      { "name": "output", "type": "string", "description": "Output file (-output)", "required": false }
+    ]
+  },
+  {
+    "id": "openvas",
+    "name": "OpenVAS",
+    "category": "Vulnerability",
+    "description": "Open Vulnerability Assessment Scanner. Full-featured vulnerability scanner with extensive plugin library.",
+    "command": "gvm-cli",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "shield-alert",
+    "docLink": "docs/tools/openvas",
+    "parameters": [
+      { "name": "target", "type": "string", "description": "Target host or network", "required": true },
+      { "name": "scanConfig", "type": "enum", "description": "Scan configuration", "required": false, "default": "Full and fast", "options": ["Full and fast", "Full and deep", "Discovery", "Host Discovery"] }
+    ]
+  },
+  {
+    "id": "sqlmap",
+    "name": "SQLMap",
+    "category": "Vulnerability",
+    "description": "Automatic SQL injection detection and exploitation tool. Supports all major database management systems.",
+    "command": "sqlmap",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "database",
+    "docLink": "docs/tools/sqlmap",
+    "parameters": [
+      { "name": "url", "type": "string", "description": "Target URL with parameter (-u)", "required": true },
+      { "name": "data", "type": "string", "description": "POST data (--data)", "required": false },
+      { "name": "cookie", "type": "string", "description": "HTTP cookie (--cookie)", "required": false },
+      { "name": "level", "type": "enum", "description": "Test level (--level)", "required": false, "default": "1", "options": ["1", "2", "3", "4", "5"] },
+      { "name": "risk", "type": "enum", "description": "Risk level (--risk)", "required": false, "default": "1", "options": ["1", "2", "3"] },
+      { "name": "dbs", "type": "boolean", "description": "Enumerate databases (--dbs)", "required": false, "default": false },
+      { "name": "tables", "type": "boolean", "description": "Enumerate tables (--tables)", "required": false, "default": false },
+      { "name": "dump", "type": "boolean", "description": "Dump table entries (--dump)", "required": false, "default": false },
+      { "name": "batch", "type": "boolean", "description": "Never ask for input (--batch)", "required": false, "default": true }
+    ]
+  },
+  {
+    "id": "wpscan",
+    "name": "WPScan",
+    "category": "Vulnerability",
+    "description": "WordPress security scanner. Detect vulnerabilities in WordPress installations, themes, and plugins.",
+    "command": "wpscan",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "globe",
+    "docLink": "docs/tools/wpscan",
+    "parameters": [
+      { "name": "url", "type": "string", "description": "Target WordPress URL (--url)", "required": true },
+      { "name": "enumerate", "type": "enum", "description": "Enumeration mode (-e)", "required": false, "default": "vp", "options": ["vp", "ap", "vt", "at", "u", "m"] },
+      { "name": "apiToken", "type": "string", "description": "WPVulnDB API token (--api-token)", "required": false }
+    ]
+  },
+  {
+    "id": "metasploit",
+    "name": "Metasploit Framework",
+    "category": "Exploitation",
+    "description": "World's most used penetration testing framework. Develop and execute exploit code against remote targets.",
+    "command": "msfconsole",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "skull",
+    "docLink": "docs/tools/metasploit",
+    "parameters": [
+      { "name": "resource", "type": "string", "description": "Resource script to run (-r)", "required": false },
+      { "name": "module", "type": "string", "description": "Module to use (use)", "required": false },
+      { "name": "rhost", "type": "string", "description": "Remote host (RHOSTS)", "required": false },
+      { "name": "rport", "type": "number", "description": "Remote port (RPORT)", "required": false },
+      { "name": "payload", "type": "string", "description": "Payload to use (set PAYLOAD)", "required": false },
+      { "name": "lhost", "type": "string", "description": "Local host for reverse shell (LHOST)", "required": false },
+      { "name": "lport", "type": "number", "description": "Local port for reverse shell (LPORT)", "required": false, "default": 4444 }
+    ]
+  },
+  {
+    "id": "searchsploit",
+    "name": "SearchSploit",
+    "category": "Exploitation",
+    "description": "Command-line search tool for Exploit-DB. Search offline copies of exploits and shellcode.",
+    "command": "searchsploit",
+    "requiresRoot": false,
+    "requiresNetwork": false,
+    "icon": "search-circle",
+    "docLink": "docs/tools/searchsploit",
+    "parameters": [
+      { "name": "query", "type": "string", "description": "Search query", "required": true },
+      { "name": "exact", "type": "boolean", "description": "Exact match (-e)", "required": false, "default": false },
+      { "name": "json", "type": "boolean", "description": "JSON output (-j)", "required": false, "default": false },
+      { "name": "www", "type": "boolean", "description": "Show Exploit-DB URLs (-w)", "required": false, "default": false }
+    ]
+  },
+  {
+    "id": "beef",
+    "name": "BeEF",
+    "category": "Exploitation",
+    "description": "Browser Exploitation Framework. Assess the security posture of a target using client-side attack vectors.",
+    "command": "beef-xss",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "desktop",
+    "docLink": "docs/tools/beef",
+    "parameters": [
+      { "name": "interface", "type": "string", "description": "Network interface to bind", "required": false, "default": "0.0.0.0" },
+      { "name": "port", "type": "number", "description": "Web UI port", "required": false, "default": 3000 }
+    ]
+  },
+  {
+    "id": "burpsuite",
+    "name": "Burp Suite",
+    "category": "Web",
+    "description": "Leading web application security testing platform. Intercept, inspect, and modify HTTP/S traffic.",
+    "command": "burpsuite",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "construct",
+    "docLink": "docs/tools/burpsuite",
+    "parameters": [
+      { "name": "proxyPort", "type": "number", "description": "Proxy listener port", "required": false, "default": 8080 },
+      { "name": "targetUrl", "type": "string", "description": "Target URL for scanning", "required": false },
+      { "name": "interceptEnabled", "type": "boolean", "description": "Enable request interception", "required": false, "default": true }
+    ]
+  },
+  {
+    "id": "owasp-zap",
+    "name": "OWASP ZAP",
+    "category": "Web",
+    "description": "Zed Attack Proxy — free web app security scanner. Automated scanner with active and passive scanning.",
+    "command": "zaproxy",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "shield-checkmark",
+    "docLink": "docs/tools/owasp-zap",
+    "parameters": [
+      { "name": "target", "type": "string", "description": "Target URL", "required": true },
+      { "name": "quickScan", "type": "boolean", "description": "Quick scan mode", "required": false, "default": true },
+      { "name": "port", "type": "number", "description": "Proxy port", "required": false, "default": 8090 }
+    ]
+  },
+  {
+    "id": "dirb",
+    "name": "Dirb",
+    "category": "Web",
+    "description": "Web content scanner. Brute-force directories and files on web servers using dictionary-based attacks.",
+    "command": "dirb",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "folder-open",
+    "docLink": "docs/tools/dirb",
+    "parameters": [
+      { "name": "url", "type": "string", "description": "Target URL", "required": true },
+      { "name": "wordlist", "type": "string", "description": "Wordlist file path", "required": false, "default": "/usr/share/dirb/wordlists/common.txt" },
+      { "name": "extensions", "type": "string", "description": "File extensions (-X)", "required": false }
+    ]
+  },
+  {
+    "id": "gobuster",
+    "name": "Gobuster",
+    "category": "Web",
+    "description": "Directory/file, DNS, and VHost brute-forcing tool written in Go. Fast and flexible.",
+    "command": "gobuster",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "folder-search",
+    "docLink": "docs/tools/gobuster",
+    "parameters": [
+      { "name": "mode", "type": "enum", "description": "Brute-force mode", "required": true, "options": ["dir", "dns", "vhost", "fuzz"] },
+      { "name": "url", "type": "string", "description": "Target URL (-u)", "required": true },
+      { "name": "wordlist", "type": "string", "description": "Wordlist (-w)", "required": true },
+      { "name": "threads", "type": "number", "description": "Threads (-t)", "required": false, "default": 10 },
+      { "name": "extensions", "type": "string", "description": "File extensions (-x)", "required": false },
+      { "name": "statusCodes", "type": "string", "description": "Status codes to match (-s)", "required": false }
+    ]
+  },
+  {
+    "id": "wfuzz",
+    "name": "Wfuzz",
+    "category": "Web",
+    "description": "Web application fuzzer. Brute-force parameters, directories, headers, and more using FUZZ keyword.",
+    "command": "wfuzz",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "shuffle",
+    "docLink": "docs/tools/wfuzz",
+    "parameters": [
+      { "name": "url", "type": "string", "description": "Target URL with FUZZ keyword (-u)", "required": true },
+      { "name": "wordlist", "type": "string", "description": "Wordlist (-w)", "required": true },
+      { "name": "hideCode", "type": "string", "description": "Hide responses by code (--hc)", "required": false },
+      { "name": "threads", "type": "number", "description": "Concurrent threads (-t)", "required": false, "default": 10 }
+    ]
+  },
+  {
+    "id": "ffuf",
+    "name": "ffuf",
+    "category": "Web",
+    "description": "Fast web fuzzer written in Go. Extremely fast directory/parameter/subdomain fuzzing.",
+    "command": "ffuf",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "flash-outline",
+    "docLink": "docs/tools/ffuf",
+    "parameters": [
+      { "name": "url", "type": "string", "description": "Target URL with FUZZ keyword (-u)", "required": true },
+      { "name": "wordlist", "type": "string", "description": "Wordlist (-w)", "required": true },
+      { "name": "threads", "type": "number", "description": "Threads (-t)", "required": false, "default": 40 },
+      { "name": "matchCode", "type": "string", "description": "Match HTTP codes (-mc)", "required": false, "default": "200,204,301,302,307,401,403" },
+      { "name": "filterSize", "type": "string", "description": "Filter by size (-fs)", "required": false }
+    ]
+  },
+  {
+    "id": "aircrack-ng",
+    "name": "Aircrack-ng",
+    "category": "Wireless",
+    "description": "Complete suite for WiFi network security assessment. Monitor, attack, test, and crack WEP/WPA.",
+    "command": "aircrack-ng",
+    "requiresRoot": true,
+    "requiresNetwork": true,
+    "icon": "wifi",
+    "docLink": "docs/tools/aircrack",
+    "parameters": [
+      { "name": "capFile", "type": "string", "description": "Capture file (.cap)", "required": true },
+      { "name": "wordlist", "type": "string", "description": "Wordlist for WPA (-w)", "required": false },
+      { "name": "bssid", "type": "string", "description": "Target AP BSSID (-b)", "required": false },
+      { "name": "essid", "type": "string", "description": "Target AP ESSID (-e)", "required": false }
+    ]
+  },
+  {
+    "id": "wifite",
+    "name": "Wifite",
+    "category": "Wireless",
+    "description": "Automated wireless attack tool. Automates WEP/WPA/WPS cracking with minimal user interaction.",
+    "command": "wifite",
+    "requiresRoot": true,
+    "requiresNetwork": true,
+    "icon": "radio",
+    "docLink": "docs/tools/wifite",
+    "parameters": [
+      { "name": "interface", "type": "string", "description": "Wireless interface (-i)", "required": false },
+      { "name": "wpa", "type": "boolean", "description": "Target only WPA networks (--wpa)", "required": false, "default": false },
+      { "name": "wep", "type": "boolean", "description": "Target only WEP networks (--wep)", "required": false, "default": false },
+      { "name": "wps", "type": "boolean", "description": "Target only WPS networks (--wps)", "required": false, "default": false }
+    ]
+  },
+  {
+    "id": "reaver",
+    "name": "Reaver",
+    "category": "Wireless",
+    "description": "WPS brute-force attack tool. Exploits WPS registrar PINs to recover WPA/WPA2 passphrases.",
+    "command": "reaver",
+    "requiresRoot": true,
+    "requiresNetwork": true,
+    "icon": "lock-open",
+    "docLink": "docs/tools/reaver",
+    "parameters": [
+      { "name": "interface", "type": "string", "description": "Monitor interface (-i)", "required": true },
+      { "name": "bssid", "type": "string", "description": "Target AP BSSID (-b)", "required": true },
+      { "name": "channel", "type": "number", "description": "Channel (-c)", "required": false },
+      { "name": "verbose", "type": "boolean", "description": "Verbose mode (-vv)", "required": false, "default": true }
+    ]
+  },
+  {
+    "id": "john",
+    "name": "John the Ripper",
+    "category": "Password",
+    "description": "Fast password cracker. Supports hundreds of hash and cipher types for offline password recovery.",
+    "command": "john",
+    "requiresRoot": false,
+    "requiresNetwork": false,
+    "icon": "hammer",
+    "docLink": "docs/tools/john",
+    "parameters": [
+      { "name": "hashFile", "type": "string", "description": "File containing hashes", "required": true },
+      { "name": "wordlist", "type": "string", "description": "Wordlist file (--wordlist)", "required": false },
+      { "name": "format", "type": "string", "description": "Hash format (--format)", "required": false },
+      { "name": "rules", "type": "boolean", "description": "Enable word mangling rules (--rules)", "required": false, "default": false },
+      { "name": "incremental", "type": "boolean", "description": "Incremental (brute-force) mode (--incremental)", "required": false, "default": false },
+      { "name": "show", "type": "boolean", "description": "Show cracked passwords (--show)", "required": false, "default": false }
+    ]
+  },
+  {
+    "id": "hashcat",
+    "name": "Hashcat",
+    "category": "Password",
+    "description": "Advanced GPU-accelerated password recovery. World's fastest password cracker.",
+    "command": "hashcat",
+    "requiresRoot": false,
+    "requiresNetwork": false,
+    "icon": "speedometer",
+    "docLink": "docs/tools/hashcat",
+    "parameters": [
+      { "name": "hashFile", "type": "string", "description": "File containing hashes", "required": true },
+      { "name": "hashMode", "type": "number", "description": "Hash type (-m)", "required": true },
+      { "name": "attackMode", "type": "enum", "description": "Attack mode (-a)", "required": false, "default": "0", "options": ["0", "1", "3", "6", "7"] },
+      { "name": "wordlist", "type": "string", "description": "Wordlist for dictionary attack", "required": false },
+      { "name": "mask", "type": "string", "description": "Mask for brute-force (?a?a?a?a)", "required": false },
+      { "name": "rules", "type": "string", "description": "Rules file (-r)", "required": false }
+    ]
+  },
+  {
+    "id": "hydra",
+    "name": "Hydra",
+    "category": "Password",
+    "description": "Fast online password cracker. Supports 50+ protocols including SSH, FTP, HTTP, SMB, RDP.",
+    "command": "hydra",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "key",
+    "docLink": "docs/tools/hydra",
+    "parameters": [
+      { "name": "target", "type": "string", "description": "Target host", "required": true },
+      { "name": "protocol", "type": "enum", "description": "Protocol/service", "required": true, "options": ["ssh", "ftp", "http-get", "http-post-form", "smb", "rdp", "mysql", "postgresql", "vnc", "smtp", "pop3", "imap", "telnet"] },
+      { "name": "login", "type": "string", "description": "Username (-l) or list (-L)", "required": false },
+      { "name": "wordlist", "type": "string", "description": "Password list (-P)", "required": true },
+      { "name": "threads", "type": "number", "description": "Threads (-t)", "required": false, "default": 16 },
+      { "name": "port", "type": "number", "description": "Target port (-s)", "required": false },
+      { "name": "httpForm", "type": "string", "description": "HTTP form path:params:fail_string", "required": false }
+    ]
+  },
+  {
+    "id": "medusa",
+    "name": "Medusa",
+    "category": "Password",
+    "description": "Speedy, parallel, modular login brute-forcer. Alternative to Hydra with module-based architecture.",
+    "command": "medusa",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "lock-closed",
+    "docLink": "docs/tools/medusa",
+    "parameters": [
+      { "name": "host", "type": "string", "description": "Target host (-h)", "required": true },
+      { "name": "user", "type": "string", "description": "Username (-u)", "required": true },
+      { "name": "wordlist", "type": "string", "description": "Password file (-P)", "required": true },
+      { "name": "module", "type": "enum", "description": "Service module (-M)", "required": true, "options": ["ssh", "ftp", "http", "smb", "mysql", "postgres", "telnet", "vnc"] },
+      { "name": "threads", "type": "number", "description": "Threads (-t)", "required": false, "default": 10 }
+    ]
+  },
+  {
+    "id": "wireshark",
+    "name": "Wireshark / tshark",
+    "category": "Sniffing",
+    "description": "Network protocol analyzer. Capture and interactively browse network traffic. tshark for CLI.",
+    "command": "tshark",
+    "requiresRoot": true,
+    "requiresNetwork": true,
+    "icon": "analytics",
+    "docLink": "docs/tools/wireshark",
+    "parameters": [
+      { "name": "interface", "type": "string", "description": "Capture interface (-i)", "required": false, "default": "any" },
+      { "name": "captureFilter", "type": "string", "description": "Capture filter (BPF) (-f)", "required": false },
+      { "name": "displayFilter", "type": "string", "description": "Display filter (-Y)", "required": false },
+      { "name": "count", "type": "number", "description": "Packet count (-c)", "required": false },
+      { "name": "outputFile", "type": "string", "description": "Output pcap file (-w)", "required": false },
+      { "name": "readFile", "type": "string", "description": "Read pcap file (-r)", "required": false }
+    ]
+  },
+  {
+    "id": "tcpdump",
+    "name": "tcpdump",
+    "category": "Sniffing",
+    "description": "Command-line packet analyzer. Lightweight alternative to Wireshark for packet capture.",
+    "command": "tcpdump",
+    "requiresRoot": true,
+    "requiresNetwork": true,
+    "icon": "document-text",
+    "docLink": "docs/tools/tcpdump",
+    "parameters": [
+      { "name": "interface", "type": "string", "description": "Capture interface (-i)", "required": false, "default": "any" },
+      { "name": "filter", "type": "string", "description": "BPF filter expression", "required": false },
+      { "name": "count", "type": "number", "description": "Packet count (-c)", "required": false },
+      { "name": "verbose", "type": "boolean", "description": "Verbose output (-v)", "required": false, "default": false },
+      { "name": "writeFile", "type": "string", "description": "Output file (-w)", "required": false }
+    ]
+  },
+  {
+    "id": "ettercap",
+    "name": "Ettercap",
+    "category": "Sniffing",
+    "description": "Comprehensive MITM attack suite. ARP poisoning, DNS spoofing, and traffic interception.",
+    "command": "ettercap",
+    "requiresRoot": true,
+    "requiresNetwork": true,
+    "icon": "eye",
+    "docLink": "docs/tools/ettercap",
+    "parameters": [
+      { "name": "mode", "type": "enum", "description": "Attack mode", "required": true, "options": ["-T", "-G", "-C"] },
+      { "name": "interface", "type": "string", "description": "Network interface (-i)", "required": false },
+      { "name": "mitm", "type": "enum", "description": "MITM method (-M)", "required": false, "options": ["arp:remote", "dhcp", "icmp", "port"] },
+      { "name": "target1", "type": "string", "description": "Target 1 (gateway)", "required": false },
+      { "name": "target2", "type": "string", "description": "Target 2 (victim)", "required": false }
+    ]
+  },
+  {
+    "id": "bettercap",
+    "name": "Bettercap",
+    "category": "Sniffing",
+    "description": "Swiss Army knife for WiFi, Bluetooth, and Ethernet MITM attacks. Modern Ettercap alternative.",
+    "command": "bettercap",
+    "requiresRoot": true,
+    "requiresNetwork": true,
+    "icon": "shield-half",
+    "docLink": "docs/tools/bettercap",
+    "parameters": [
+      { "name": "interface", "type": "string", "description": "Network interface (-iface)", "required": false },
+      { "name": "caplet", "type": "string", "description": "Caplet to load (-caplet)", "required": false },
+      { "name": "eval", "type": "string", "description": "Commands to run (-eval)", "required": false }
+    ]
+  },
+  {
+    "id": "autopsy",
+    "name": "Autopsy",
+    "category": "Forensics",
+    "description": "Digital forensics platform. Analyze hard drives and smartphones for evidence recovery.",
+    "command": "autopsy",
+    "requiresRoot": false,
+    "requiresNetwork": false,
+    "icon": "search-sharp",
+    "docLink": "docs/tools/autopsy",
+    "parameters": [
+      { "name": "caseDir", "type": "string", "description": "Case directory", "required": true },
+      { "name": "imageFile", "type": "string", "description": "Disk image to analyze", "required": false }
+    ]
+  },
+  {
+    "id": "binwalk",
+    "name": "Binwalk",
+    "category": "Forensics",
+    "description": "Firmware analysis tool. Search binary images for embedded files and executable code.",
+    "command": "binwalk",
+    "requiresRoot": false,
+    "requiresNetwork": false,
+    "icon": "code-slash",
+    "docLink": "docs/tools/binwalk",
+    "parameters": [
+      { "name": "file", "type": "string", "description": "Binary file to analyze", "required": true },
+      { "name": "extract", "type": "boolean", "description": "Auto-extract files (-e)", "required": false, "default": false },
+      { "name": "signature", "type": "boolean", "description": "Scan for signatures (-B)", "required": false, "default": true },
+      { "name": "entropy", "type": "boolean", "description": "Entropy analysis (-E)", "required": false, "default": false }
+    ]
+  },
+  {
+    "id": "volatility",
+    "name": "Volatility",
+    "category": "Forensics",
+    "description": "Memory forensics framework. Analyze RAM dumps for malware, rootkits, and artifacts.",
+    "command": "volatility",
+    "requiresRoot": false,
+    "requiresNetwork": false,
+    "icon": "hardware-chip",
+    "docLink": "docs/tools/volatility",
+    "parameters": [
+      { "name": "memoryDump", "type": "string", "description": "Memory dump file (-f)", "required": true },
+      { "name": "profile", "type": "string", "description": "OS profile (--profile)", "required": false },
+      { "name": "plugin", "type": "enum", "description": "Plugin to run", "required": true, "options": ["imageinfo", "pslist", "pstree", "netscan", "filescan", "dumpfiles", "malfind", "hashdump", "hivelist", "cmdscan"] }
+    ]
+  },
+  {
+    "id": "foremost",
+    "name": "Foremost",
+    "category": "Forensics",
+    "description": "File carving tool. Recover files from disk images based on headers, footers, and data structures.",
+    "command": "foremost",
+    "requiresRoot": false,
+    "requiresNetwork": false,
+    "icon": "document-attach",
+    "docLink": "docs/tools/foremost",
+    "parameters": [
+      { "name": "inputFile", "type": "string", "description": "Input file or device (-i)", "required": true },
+      { "name": "outputDir", "type": "string", "description": "Output directory (-o)", "required": false },
+      { "name": "fileTypes", "type": "string", "description": "File types to carve (-t)", "required": false, "default": "all" },
+      { "name": "verbose", "type": "boolean", "description": "Verbose mode (-v)", "required": false, "default": false }
+    ]
+  },
+  {
+    "id": "theharvester",
+    "name": "theHarvester",
+    "category": "Recon",
+    "description": "OSINT tool for gathering emails, subdomains, hosts, and names from public sources.",
+    "command": "theHarvester",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "mail",
+    "docLink": "docs/tools/theharvester",
+    "parameters": [
+      { "name": "domain", "type": "string", "description": "Target domain (-d)", "required": true },
+      { "name": "source", "type": "enum", "description": "Data source (-b)", "required": false, "default": "all", "options": ["all", "google", "bing", "linkedin", "twitter", "shodan", "virustotal", "crtsh"] },
+      { "name": "limit", "type": "number", "description": "Result limit (-l)", "required": false, "default": 500 }
+    ]
+  },
+  {
+    "id": "shodan",
+    "name": "Shodan",
+    "category": "Recon",
+    "description": "Internet-connected device search engine. Find exposed servers, webcams, IoT devices, and SCADA systems.",
+    "command": "shodan",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "earth",
+    "docLink": "docs/tools/shodan",
+    "parameters": [
+      { "name": "query", "type": "string", "description": "Search query", "required": true },
+      { "name": "subcommand", "type": "enum", "description": "Shodan command", "required": true, "options": ["search", "host", "info", "count", "scan", "honeyscore"] },
+      { "name": "apiKey", "type": "string", "description": "API key (--key)", "required": false }
+    ]
+  },
+  {
+    "id": "recon-ng",
+    "name": "Recon-ng",
+    "category": "Recon",
+    "description": "Full-featured reconnaissance framework. Modular OSINT tool similar to Metasploit.",
+    "command": "recon-ng",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "telescope",
+    "docLink": "docs/tools/recon-ng",
+    "parameters": [
+      { "name": "workspace", "type": "string", "description": "Workspace name (-w)", "required": false },
+      { "name": "module", "type": "string", "description": "Module to load", "required": false }
+    ]
+  },
+  {
+    "id": "spiderfoot",
+    "name": "SpiderFoot",
+    "category": "Recon",
+    "description": "OSINT automation tool. Integrates with 200+ data sources for comprehensive target profiling.",
+    "command": "spiderfoot",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "bug",
+    "docLink": "docs/tools/spiderfoot",
+    "parameters": [
+      { "name": "target", "type": "string", "description": "Target (domain, IP, email, etc.) (-s)", "required": true },
+      { "name": "modules", "type": "string", "description": "Specific modules to use (-m)", "required": false },
+      { "name": "types", "type": "string", "description": "Event types to collect (-t)", "required": false }
+    ]
+  },
+  {
+    "id": "openssl",
+    "name": "OpenSSL",
+    "category": "Crypto",
+    "description": "Cryptography toolkit. Generate keys, certificates, and perform encryption/decryption operations.",
+    "command": "openssl",
+    "requiresRoot": false,
+    "requiresNetwork": false,
+    "icon": "lock-closed",
+    "docLink": "docs/tools/openssl",
+    "parameters": [
+      { "name": "subcommand", "type": "enum", "description": "OpenSSL command", "required": true, "options": ["genrsa", "req", "x509", "enc", "dgst", "s_client", "s_server", "rand"] },
+      { "name": "args", "type": "string", "description": "Additional arguments", "required": false }
+    ]
+  },
+  {
+    "id": "gpg",
+    "name": "GPG",
+    "category": "Crypto",
+    "description": "GNU Privacy Guard. Encrypt, decrypt, and sign data using OpenPGP standard.",
+    "command": "gpg",
+    "requiresRoot": false,
+    "requiresNetwork": false,
+    "icon": "key-outline",
+    "docLink": "docs/tools/gpg",
+    "parameters": [
+      { "name": "action", "type": "enum", "description": "GPG operation", "required": true, "options": ["--encrypt", "--decrypt", "--sign", "--verify", "--gen-key", "--list-keys", "--import", "--export"] },
+      { "name": "recipient", "type": "string", "description": "Recipient (-r)", "required": false },
+      { "name": "file", "type": "string", "description": "Input file", "required": false }
+    ]
+  },
+  {
+    "id": "hash-identifier",
+    "name": "Hash Identifier",
+    "category": "Crypto",
+    "description": "Identify the type of hash. Supports MD5, SHA-1, SHA-256, SHA-512, NTLM, and many more.",
+    "command": "hash-identifier",
+    "requiresRoot": false,
+    "requiresNetwork": false,
+    "icon": "finger-print",
+    "docLink": "docs/tools/hash-identifier",
+    "parameters": [
+      { "name": "hash", "type": "string", "description": "Hash string to identify", "required": true }
+    ]
+  }
+]

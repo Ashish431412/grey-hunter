@@ -1,0 +1,463 @@
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
+import { DragonBackground } from '../../components/common/DragonBackground';
+import { getDocById, TOOL_DOCS, ToolDoc } from '../../docs/data/toolDocsData';
+
+const THEME = {
+  primary: '#00ff66',  // Dragon Green
+  accent: '#00d4ff',   // Dragon Blue
+  dragonRed: '#ff2247',
+  white: '#ffffff',
+  textDim: '#a0aec0',
+  surface: '#0d1b2e',
+  card: '#11223a',
+  cardBorder: '#1e3557',
+  codeBg: '#050a14',
+};
+
+export const DocViewerScreen = ({ route, navigation }: any) => {
+  const docId = route?.params?.docId || 'nmap';
+  const doc: ToolDoc = getDocById(docId) || TOOL_DOCS[0];
+
+  const [fontSizeOffset, setFontSizeOffset] = useState(0);
+  const [bookmarked, setBookmarked] = useState(false);
+
+  const handleOpenTerminal = () => {
+    navigation.navigate('Terminal');
+  };
+
+  const handleLaunchRunner = () => {
+    if (doc.relatedToolId) {
+      navigation.navigate('Tools', {
+        screen: 'ToolDetail',
+        params: { toolId: doc.relatedToolId },
+      });
+    } else {
+      navigation.navigate('Tools');
+    }
+  };
+
+  return (
+    <DragonBackground overlayOpacity={0.9}>
+      <View style={styles.container}>
+        {/* Top Action Bar */}
+        <View style={styles.toolbar}>
+          <TouchableOpacity
+            style={styles.backBtn}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.backBtnText}>← BACK</Text>
+          </TouchableOpacity>
+
+          <View style={styles.toolActions}>
+            <TouchableOpacity
+              style={styles.actionBtn}
+              onPress={() => setFontSizeOffset(prev => (prev < 4 ? prev + 2 : 0))}
+            >
+              <Text style={styles.actionBtnText}>
+                {fontSizeOffset === 0 ? 'A' : 'A+'}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.actionBtn, bookmarked && styles.actionBtnActive]}
+              onPress={() => {
+                setBookmarked(!bookmarked);
+                Alert.alert(
+                  bookmarked ? 'Bookmark Removed' : 'Bookmarked',
+                  `${doc.name} manual saved to your offline bookmarks.`
+                );
+              }}
+            >
+              <Text
+                style={[
+                  styles.actionBtnText,
+                  bookmarked && styles.actionBtnTextActive,
+                ]}
+              >
+                {bookmarked ? '★ SAVED' : '☆ SAVE'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <ScrollView
+          style={styles.content}
+          contentContainerStyle={styles.contentContainer}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Document Header */}
+          <View style={styles.docHeader}>
+            <View style={styles.badgeRow}>
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{doc.badge}</Text>
+              </View>
+              <Text style={styles.metaCategory}>{doc.category}</Text>
+              <Text style={styles.metaReadTime}>• {doc.readTime}</Text>
+            </View>
+
+            <Text style={[styles.docTitle, { fontSize: 22 + fontSizeOffset }]}>
+              {doc.title}
+            </Text>
+            <Text style={styles.oneLiner}>{doc.oneLiner}</Text>
+          </View>
+
+          {/* SECTION 1: WHAT IS IT? */}
+          <View style={styles.sectionCard}>
+            <Text style={styles.sectionHeader}>// 01. OVERVIEW & PURPOSE</Text>
+            <Text style={[styles.bodyText, { fontSize: 13 + fontSizeOffset }]}>
+              {doc.overview}
+            </Text>
+          </View>
+
+          {/* SECTION 2: WHY & WHEN TO USE */}
+          <View style={styles.sectionCard}>
+            <Text style={styles.sectionHeader}>// 02. WHY ETHICAL HACKERS USE IT</Text>
+            <Text style={[styles.bodyText, { fontSize: 13 + fontSizeOffset }]}>
+              {doc.whyUse}
+            </Text>
+          </View>
+
+          {/* SECTION 3: HOW IT WORKS (MECHANICS) */}
+          <View style={styles.sectionCard}>
+            <Text style={styles.sectionHeader}>// 03. HOW IT WORKS (UNDER THE HOOD)</Text>
+            <Text style={[styles.bodyText, { fontSize: 13 + fontSizeOffset }]}>
+              {doc.howItWorks}
+            </Text>
+          </View>
+
+          {/* SECTION 4: ESSENTIAL FLAGS & OPTIONS */}
+          {doc.flags && doc.flags.length > 0 && (
+            <View style={styles.sectionCard}>
+              <Text style={styles.sectionHeader}>// 04. ESSENTIAL FLAGS & SYNTAX</Text>
+              {doc.flags.map((f, idx) => (
+                <View key={idx} style={styles.flagRow}>
+                  <View style={styles.flagBadge}>
+                    <Text style={styles.flagText}>{f.flag}</Text>
+                  </View>
+                  <View style={styles.flagContent}>
+                    <Text style={styles.flagSyntax}>{f.syntax}</Text>
+                    <Text style={[styles.flagDesc, { fontSize: 12 + fontSizeOffset }]}>
+                      {f.desc}
+                    </Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          )}
+
+          {/* SECTION 5: PRACTICAL COMMAND EXAMPLES */}
+          <View style={styles.sectionCard}>
+            <Text style={styles.sectionHeader}>// 05. HANDS-ON COMMAND EXAMPLES</Text>
+            {doc.commands.map((cmdItem, idx) => (
+              <View key={idx} style={styles.cmdCard}>
+                <Text style={styles.cmdDesc}># {cmdItem.desc}</Text>
+                <View style={styles.codeBox}>
+                  <Text style={styles.codeText}>{cmdItem.cmd}</Text>
+                </View>
+                {cmdItem.exampleOutput && (
+                  <View style={styles.outputBox}>
+                    <Text style={styles.outputLabel}>EXPECTED OUTPUT:</Text>
+                    <Text style={styles.outputText}>{cmdItem.exampleOutput}</Text>
+                  </View>
+                )}
+              </View>
+            ))}
+          </View>
+
+          {/* SECTION 6: DEFENSE & MITIGATION */}
+          <View style={[styles.sectionCard, styles.defenseCard]}>
+            <Text style={styles.defenseHeader}>🛡️ DEFENSIVE MITIGATION & PROTECTION</Text>
+            <Text style={[styles.defenseText, { fontSize: 13 + fontSizeOffset }]}>
+              {doc.defenseTips}
+            </Text>
+          </View>
+
+          {/* Quick Launch Buttons */}
+          <View style={styles.actionRow}>
+            {doc.relatedToolId && (
+              <TouchableOpacity
+                style={styles.runnerBtn}
+                onPress={handleLaunchRunner}
+              >
+                <Text style={styles.runnerBtnText}>⚡ LAUNCH RUNNER</Text>
+              </TouchableOpacity>
+            )}
+
+            <TouchableOpacity
+              style={styles.terminalBtn}
+              onPress={handleOpenTerminal}
+            >
+              <Text style={styles.terminalBtnText}>&gt;_ OPEN TERMINAL</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </View>
+    </DragonBackground>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  toolbar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: THEME.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: THEME.cardBorder,
+  },
+  backBtn: {
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  backBtnText: {
+    color: THEME.primary,
+    fontFamily: 'monospace',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  toolActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  actionBtn: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: THEME.cardBorder,
+    backgroundColor: THEME.card,
+  },
+  actionBtnActive: {
+    borderColor: THEME.primary,
+    backgroundColor: 'rgba(0, 255, 102, 0.15)',
+  },
+  actionBtnText: {
+    color: THEME.accent,
+    fontFamily: 'monospace',
+    fontSize: 11,
+    fontWeight: 'bold',
+  },
+  actionBtnTextActive: {
+    color: THEME.primary,
+  },
+  content: {
+    flex: 1,
+  },
+  contentContainer: {
+    padding: 16,
+    paddingBottom: 40,
+  },
+  docHeader: {
+    marginBottom: 16,
+    paddingBottom: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: THEME.cardBorder,
+  },
+  badgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  badge: {
+    backgroundColor: 'rgba(0, 255, 102, 0.15)',
+    borderWidth: 1,
+    borderColor: THEME.primary,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    marginRight: 8,
+  },
+  badgeText: {
+    color: THEME.primary,
+    fontFamily: 'monospace',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  metaCategory: {
+    color: THEME.accent,
+    fontFamily: 'monospace',
+    fontSize: 11,
+    fontWeight: 'bold',
+  },
+  metaReadTime: {
+    color: THEME.textDim,
+    fontFamily: 'monospace',
+    fontSize: 11,
+    marginLeft: 6,
+  },
+  docTitle: {
+    color: THEME.white,
+    fontFamily: 'monospace',
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  oneLiner: {
+    color: THEME.accent,
+    fontFamily: 'monospace',
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  sectionCard: {
+    backgroundColor: THEME.card,
+    borderWidth: 1,
+    borderColor: THEME.cardBorder,
+    padding: 16,
+    marginBottom: 14,
+  },
+  sectionHeader: {
+    color: THEME.primary,
+    fontFamily: 'monospace',
+    fontSize: 13,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    letterSpacing: 0.5,
+  },
+  bodyText: {
+    color: THEME.white,
+    fontFamily: 'monospace',
+    lineHeight: 20,
+  },
+  flagRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 10,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  flagBadge: {
+    backgroundColor: 'rgba(0, 212, 255, 0.15)',
+    borderWidth: 1,
+    borderColor: THEME.accent,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    marginRight: 10,
+    minWidth: 44,
+    alignItems: 'center',
+  },
+  flagText: {
+    color: THEME.accent,
+    fontFamily: 'monospace',
+    fontSize: 11,
+    fontWeight: 'bold',
+  },
+  flagContent: {
+    flex: 1,
+  },
+  flagSyntax: {
+    color: THEME.white,
+    fontFamily: 'monospace',
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginBottom: 3,
+  },
+  flagDesc: {
+    color: THEME.textDim,
+    fontFamily: 'monospace',
+    lineHeight: 16,
+  },
+  cmdCard: {
+    marginBottom: 14,
+  },
+  cmdDesc: {
+    color: THEME.textDim,
+    fontFamily: 'monospace',
+    fontSize: 12,
+    marginBottom: 4,
+  },
+  codeBox: {
+    backgroundColor: THEME.codeBg,
+    borderWidth: 1,
+    borderColor: THEME.cardBorder,
+    borderLeftWidth: 3,
+    borderLeftColor: THEME.accent,
+    padding: 10,
+    marginBottom: 6,
+  },
+  codeText: {
+    color: THEME.accent,
+    fontFamily: 'monospace',
+    fontSize: 12,
+  },
+  outputBox: {
+    backgroundColor: '#04070d',
+    padding: 8,
+    borderWidth: 1,
+    borderColor: '#0c1626',
+  },
+  outputLabel: {
+    color: '#627d98',
+    fontFamily: 'monospace',
+    fontSize: 9,
+    marginBottom: 4,
+  },
+  outputText: {
+    color: '#9fb3c8',
+    fontFamily: 'monospace',
+    fontSize: 11,
+    lineHeight: 16,
+  },
+  defenseCard: {
+    borderLeftWidth: 4,
+    borderLeftColor: THEME.primary,
+    backgroundColor: 'rgba(0, 255, 102, 0.04)',
+  },
+  defenseHeader: {
+    color: THEME.primary,
+    fontFamily: 'monospace',
+    fontSize: 13,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  defenseText: {
+    color: THEME.white,
+    fontFamily: 'monospace',
+    lineHeight: 20,
+  },
+  actionRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 6,
+    marginBottom: 20,
+  },
+  runnerBtn: {
+    flex: 1,
+    backgroundColor: THEME.primary,
+    paddingVertical: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  runnerBtnText: {
+    color: '#070f1e',
+    fontFamily: 'monospace',
+    fontSize: 13,
+    fontWeight: 'bold',
+  },
+  terminalBtn: {
+    flex: 1,
+    backgroundColor: THEME.surface,
+    borderWidth: 1,
+    borderColor: THEME.accent,
+    paddingVertical: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  terminalBtnText: {
+    color: THEME.accent,
+    fontFamily: 'monospace',
+    fontSize: 13,
+    fontWeight: 'bold',
+  },
+});

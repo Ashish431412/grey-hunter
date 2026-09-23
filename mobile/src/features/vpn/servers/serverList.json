@@ -1,0 +1,37 @@
+[
+  {
+    "id": "lab-server-1",
+    "name": "US-East Test Lab",
+    "region": "US-East",
+    "endpoint": "vpn.useast.greyhunter.io:51820",
+    "publicKey": "base64publickeyhere"
+  },
+  {
+    "id": "lab-server-2",
+    "name": "US-West Test Lab",
+    "region": "US-West",
+    "endpoint": "vpn.uswest.greyhunter.io:51820",
+    "publicKey": "base64publickeyhere"
+  },
+  {
+    "id": "lab-server-3",
+    "name": "EU-Central Test Lab",
+    "region": "EU-Central",
+    "endpoint": "vpn.eucentral.greyhunter.io:51820",
+    "publicKey": "base64publickeyhere"
+  },
+  {
+    "id": "lab-server-4",
+    "name": "AP-South Test Lab",
+    "region": "AP-South",
+    "endpoint": "vpn.apsouth.greyhunter.io:51820",
+    "publicKey": "base64publickeyhere"
+  },
+  {
+    "id": "lab-server-5",
+    "name": "Isolated Malware Sandbox",
+    "region": "Isolated",
+    "endpoint": "sandbox.greyhunter.io:51820",
+    "publicKey": "base64publickeyhere"
+  }
+]

@@ -1,0 +1,194 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  STUDENT
+  INSTRUCTOR
+  ADMIN
+}
+
+enum ProjectVisibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum MemberRole {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  REVIEW
+  DONE
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ToolStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+model User {
+  id                 String          @id @default(uuid())
+  email              String          @unique
+  passwordHash       String
+  displayName        String
+  role               Role            @default(STUDENT)
+  biometricPublicKey String?
+  avatarUrl          String?
+  isActive           Boolean         @default(true)
+  lastLoginAt        DateTime?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  projects           Project[]       @relation("ProjectOwner")
+  projectMemberships ProjectMember[]
+  assignedTasks      Task[]          @relation("TaskAssignee")
+  reportedTasks      Task[]          @relation("TaskReporter")
+  taskComments       TaskComment[]
+  toolExecutions     ToolExecution[]
+  auditLogs          AuditLog[]
+  syncStates         SyncState[]
+  encryptedBlobs     EncryptedBlob[]
+}
+
+model Project {
+  id          String          @id @default(uuid())
+  name        String
+  description String?
+  ownerId     String
+  visibility  ProjectVisibility @default(PRIVATE)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  owner       User            @relation("ProjectOwner", fields: [ownerId], references: [id])
+  members     ProjectMember[]
+  boards      Board[]
+}
+
+model ProjectMember {
+  id        String     @id @default(uuid())
+  projectId String
+  userId    String
+  role      MemberRole @default(VIEWER)
+  joinedAt  DateTime   @default(now())
+
+  project   Project    @relation(fields: [projectId], references: [id])
+  user      User       @relation(fields: [userId], references: [id])
+
+  @@unique([projectId, userId])
+}
+
+model Board {
+  id        String   @id @default(uuid())
+  projectId String
+  name      String
+  columns   Json
+  createdAt DateTime @default(now())
+
+  project   Project  @relation(fields: [projectId], references: [id])
+  tasks     Task[]
+}
+
+model Task {
+  id          String       @id @default(uuid())
+  boardId     String
+  title       String
+  description String?
+  status      TaskStatus   @default(TODO)
+  priority    TaskPriority @default(MEDIUM)
+  assigneeId  String?
+  reporterId  String
+  position    Float
+  dueDate     DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  board       Board         @relation(fields: [boardId], references: [id])
+  assignee    User?         @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  reporter    User          @relation("TaskReporter", fields: [reporterId], references: [id])
+  comments    TaskComment[]
+}
+
+model TaskComment {
+  id        String   @id @default(uuid())
+  taskId    String
+  authorId  String
+  content   String
+  createdAt DateTime @default(now())
+
+  task      Task     @relation(fields: [taskId], references: [id])
+  author    User     @relation(fields: [authorId], references: [id])
+}
+
+model ToolExecution {
+  id            String     @id @default(uuid())
+  userId        String
+  toolName      String
+  parameters    Json
+  status        ToolStatus @default(PENDING)
+  resultSummary String?
+  startedAt     DateTime   @default(now())
+  completedAt   DateTime?
+
+  user          User       @relation(fields: [userId], references: [id])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  action     String
+  resource   String
+  resourceId String?
+  metadata   Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  user       User?    @relation(fields: [userId], references: [id])
+}
+
+model SyncState {
+  id         String   @id @default(uuid())
+  userId     String
+  deviceId   String
+  lastSyncAt DateTime @default(now())
+  syncCursor String
+  createdAt  DateTime @default(now())
+
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, deviceId])
+}
+
+model EncryptedBlob {
+  id            String   @id @default(uuid())
+  userId        String
+  blobKey       String
+  encryptedData Bytes
+  iv            String
+  authTag       String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user          User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, blobKey])
+}
