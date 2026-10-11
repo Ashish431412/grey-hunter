@@ -850,5 +850,210 @@
       { "name": "scanType", "type": "enum", "description": "Scan source type", "required": false, "default": "git", "options": ["git", "filesystem", "s3", "github"] },
       { "name": "onlyVerified", "type": "boolean", "description": "Only return verified live keys (--only-verified)", "required": false, "default": false }
     ]
+  },
+  {
+    "id": "responder",
+    "name": "Responder",
+    "category": "Network",
+    "description": "LLMNR/NBT-NS/MDNS poisoner and NTLMv2 hash capture tool for credential harvesting on local networks.",
+    "command": "responder",
+    "requiresRoot": true,
+    "requiresNetwork": true,
+    "icon": "account-key",
+    "docLink": "docs/tools/responder",
+    "parameters": [
+      { "name": "interface", "type": "string", "description": "Network interface (-I eth0)", "required": true },
+      { "name": "analyze", "type": "boolean", "description": "Analyze mode - listen only (-A)", "required": false, "default": false },
+      { "name": "wpad", "type": "boolean", "description": "Enable WPAD rogue proxy (-w)", "required": false, "default": false },
+      { "name": "fingerprint", "type": "boolean", "description": "Fingerprint hosts (-f)", "required": false, "default": false }
+    ]
+  },
+  {
+    "id": "crackmapexec",
+    "name": "CrackMapExec",
+    "category": "Exploitation",
+    "description": "Swiss army knife for pentesting Windows/Active Directory environments. Supports SMB, WinRM, LDAP, MSSQL, SSH, and RDP protocols.",
+    "command": "crackmapexec",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "microsoft-windows",
+    "docLink": "docs/tools/crackmapexec",
+    "parameters": [
+      { "name": "protocol", "type": "enum", "description": "Protocol to attack", "required": true, "default": "smb", "options": ["smb", "winrm", "ldap", "mssql", "ssh", "rdp"] },
+      { "name": "target", "type": "string", "description": "Target IP, range, or CIDR", "required": true },
+      { "name": "username", "type": "string", "description": "Username (-u)", "required": false },
+      { "name": "password", "type": "string", "description": "Password (-p)", "required": false },
+      { "name": "shares", "type": "boolean", "description": "Enumerate SMB shares (--shares)", "required": false, "default": false },
+      { "name": "sam", "type": "boolean", "description": "Dump SAM hashes (--sam)", "required": false, "default": false }
+    ]
+  },
+  {
+    "id": "enum4linux",
+    "name": "Enum4linux-ng",
+    "category": "Recon",
+    "description": "Next-gen Windows/Samba enumeration tool. Extracts users, groups, shares, password policies, and OS info via SMB, LDAP, and RPC.",
+    "command": "enum4linux-ng",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "server-network",
+    "docLink": "docs/tools/enum4linux",
+    "parameters": [
+      { "name": "target", "type": "string", "description": "Target IP address", "required": true },
+      { "name": "allModules", "type": "boolean", "description": "Run all enumeration modules (-A)", "required": false, "default": true },
+      { "name": "username", "type": "string", "description": "Username for auth (-u)", "required": false },
+      { "name": "password", "type": "string", "description": "Password for auth (-p)", "required": false }
+    ]
+  },
+  {
+    "id": "feroxbuster",
+    "name": "Feroxbuster",
+    "category": "Web",
+    "description": "Fast, recursive content discovery tool written in Rust. Finds hidden directories, files, and API endpoints on web servers.",
+    "command": "feroxbuster",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "folder-search",
+    "docLink": "docs/tools/feroxbuster",
+    "parameters": [
+      { "name": "url", "type": "string", "description": "Target URL (-u)", "required": true },
+      { "name": "wordlist", "type": "string", "description": "Wordlist path (-w)", "required": false, "default": "/usr/share/seclists/Discovery/Web-Content/raft-medium-directories.txt" },
+      { "name": "threads", "type": "number", "description": "Concurrent threads (-t)", "required": false, "default": 50 },
+      { "name": "depth", "type": "number", "description": "Recursion depth (-d)", "required": false, "default": 2 },
+      { "name": "extensions", "type": "string", "description": "File extensions (-x php,html,js)", "required": false },
+      { "name": "statusCodes", "type": "string", "description": "Status codes to include (-s 200,301,302)", "required": false }
+    ]
+  },
+  {
+    "id": "whatweb",
+    "name": "WhatWeb",
+    "category": "Recon",
+    "description": "Web technology fingerprinting tool. Identifies CMS, frameworks, server software, JavaScript libraries, and analytics platforms.",
+    "command": "whatweb",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "web",
+    "docLink": "docs/tools/whatweb",
+    "parameters": [
+      { "name": "target", "type": "string", "description": "Target URL or IP", "required": true },
+      { "name": "aggression", "type": "enum", "description": "Aggression level (-a)", "required": false, "default": "3", "options": ["1", "2", "3", "4"] },
+      { "name": "verbose", "type": "boolean", "description": "Verbose output (-v)", "required": false, "default": true }
+    ]
+  },
+  {
+    "id": "dnsrecon",
+    "name": "DNSRecon",
+    "category": "Recon",
+    "description": "Comprehensive DNS enumeration and reconnaissance tool. Performs zone transfers, brute-force subdomains, cache snooping, and record lookups.",
+    "command": "dnsrecon",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "dns",
+    "docLink": "docs/tools/dnsrecon",
+    "parameters": [
+      { "name": "domain", "type": "string", "description": "Target domain (-d)", "required": true },
+      { "name": "type", "type": "enum", "description": "Enumeration type (-t)", "required": false, "default": "std", "options": ["std", "brt", "axfr", "rvl", "snoop", "zonewalk"] },
+      { "name": "dictionary", "type": "string", "description": "Wordlist for brute-force (-D)", "required": false },
+      { "name": "nameserver", "type": "string", "description": "Custom nameserver (-n)", "required": false }
+    ]
+  },
+  {
+    "id": "sslscan",
+    "name": "SSLScan",
+    "category": "Crypto",
+    "description": "Tests SSL/TLS services for supported ciphers, protocols, certificate details, and known vulnerabilities like Heartbleed and POODLE.",
+    "command": "sslscan",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "lock-check",
+    "docLink": "docs/tools/sslscan",
+    "parameters": [
+      { "name": "target", "type": "string", "description": "Target host:port", "required": true },
+      { "name": "showCertificate", "type": "boolean", "description": "Show full certificate (--show-certificate)", "required": false, "default": true },
+      { "name": "noColor", "type": "boolean", "description": "Disable color output (--no-colour)", "required": false, "default": false },
+      { "name": "tlsall", "type": "boolean", "description": "Test all TLS versions (--tls-all)", "required": false, "default": false }
+    ]
+  },
+  {
+    "id": "certipy",
+    "name": "Certipy",
+    "category": "Exploitation",
+    "description": "Active Directory Certificate Services (AD CS) exploitation tool. Finds and abuses misconfigured certificate templates for privilege escalation.",
+    "command": "certipy",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "certificate",
+    "docLink": "docs/tools/certipy",
+    "parameters": [
+      { "name": "action", "type": "enum", "description": "Action to perform", "required": true, "default": "find", "options": ["find", "req", "auth", "shadow", "account", "forge"] },
+      { "name": "target", "type": "string", "description": "Target domain controller (-target)", "required": true },
+      { "name": "username", "type": "string", "description": "Username (-u)", "required": false },
+      { "name": "password", "type": "string", "description": "Password (-p)", "required": false },
+      { "name": "vulnerable", "type": "boolean", "description": "Show only vulnerable templates (-vulnerable)", "required": false, "default": true }
+    ]
+  },
+  {
+    "id": "linpeas",
+    "name": "LinPEAS",
+    "category": "Exploitation",
+    "description": "Linux Privilege Escalation Awesome Script. Automated enumeration of SUID binaries, cron jobs, writable paths, kernel exploits, and misconfigurations.",
+    "command": "linpeas.sh",
+    "requiresRoot": false,
+    "requiresNetwork": false,
+    "icon": "linux",
+    "docLink": "docs/tools/linpeas",
+    "parameters": [
+      { "name": "intensity", "type": "enum", "description": "Check intensity", "required": false, "default": "-a", "options": ["-a", "-s", "-e"] },
+      { "name": "network", "type": "boolean", "description": "Skip network checks (-N)", "required": false, "default": false }
+    ]
+  },
+  {
+    "id": "winpeas",
+    "name": "WinPEAS",
+    "category": "Exploitation",
+    "description": "Windows Privilege Escalation Awesome Script. Enumerates scheduled tasks, services, registry keys, token privileges, and unquoted service paths.",
+    "command": "winpeas.exe",
+    "requiresRoot": false,
+    "requiresNetwork": false,
+    "icon": "microsoft-windows",
+    "docLink": "docs/tools/winpeas",
+    "parameters": [
+      { "name": "module", "type": "enum", "description": "Module to run", "required": false, "default": "all", "options": ["all", "systeminfo", "userinfo", "servicesinfo", "applicationsinfo", "networkinfo"] },
+      { "name": "quiet", "type": "boolean", "description": "Quiet mode - less output (-q)", "required": false, "default": false }
+    ]
+  },
+  {
+    "id": "bloodhound",
+    "name": "BloodHound",
+    "category": "Recon",
+    "description": "Active Directory attack path mapping tool. Visualizes trust relationships, group memberships, ACLs, and shortest paths to Domain Admin.",
+    "command": "bloodhound-python",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "graph",
+    "docLink": "docs/tools/bloodhound",
+    "parameters": [
+      { "name": "domain", "type": "string", "description": "Target AD domain (-d)", "required": true },
+      { "name": "username", "type": "string", "description": "Username (-u)", "required": true },
+      { "name": "password", "type": "string", "description": "Password (-p)", "required": true },
+      { "name": "collectionMethod", "type": "enum", "description": "Collection method (-c)", "required": false, "default": "All", "options": ["All", "DCOnly", "Group", "Session", "Acl", "ObjectProps", "Trusts"] },
+      { "name": "nameserver", "type": "string", "description": "Custom nameserver (-ns)", "required": false }
+    ]
+  },
+  {
+    "id": "impacket",
+    "name": "Impacket",
+    "category": "Exploitation",
+    "description": "Collection of Python classes for working with Windows network protocols. Includes psexec, smbclient, secretsdump, GetNPUsers, and more.",
+    "command": "impacket-psexec",
+    "requiresRoot": false,
+    "requiresNetwork": true,
+    "icon": "powershell",
+    "docLink": "docs/tools/impacket",
+    "parameters": [
+      { "name": "tool", "type": "enum", "description": "Impacket tool to use", "required": true, "default": "psexec", "options": ["psexec", "smbclient", "secretsdump", "GetNPUsers", "GetUserSPNs", "wmiexec", "dcomexec", "atexec"] },
+      { "name": "target", "type": "string", "description": "Target (domain/user:password@host)", "required": true },
+      { "name": "hashes", "type": "string", "description": "NTLM hashes (LM:NT)", "required": false },
+      { "name": "command", "type": "string", "description": "Command to execute", "required": false }
+    ]
   }
 ]

@@ -15,6 +15,12 @@ export type ToolsStackParamList = {
   ToolDetail: { toolId: string };
   ToolRunner: { tool: Tool };
   ScanResults: { resultId: string };
+  NetworkMap: undefined;
+  ExploitDB: undefined;
+  CVSSCalculator: undefined;
+  PasswordGen: undefined;
+  ScanHistory: undefined;
+  CheatSheet: undefined;
 };
 
 export type TerminalStackParamList = {
@@ -26,6 +32,7 @@ export type DocsStackParamList = {
   DocsHome: undefined;
   DocViewer: { docId: string };
   LabExercise: { labId: string };
+  CheatSheet: undefined;
 };
 
 export type ProjectStackParamList = {

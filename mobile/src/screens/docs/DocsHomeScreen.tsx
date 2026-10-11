@@ -179,6 +179,22 @@ export const DocsHomeScreen = ({ navigation }: any) => {
           </View>
         </View>
 
+        {/* Quick Reference Cheat Sheet Banner */}
+        <TouchableOpacity
+          style={styles.cheatSheetBanner}
+          onPress={() => navigation.navigate('CheatSheet')}
+          activeOpacity={0.8}
+        >
+          <View style={styles.cheatSheetLeft}>
+            <Text style={styles.cheatSheetIcon}>📋</Text>
+            <View>
+              <Text style={styles.cheatSheetTitle}>COMMAND CHEAT SHEETS</Text>
+              <Text style={styles.cheatSheetSubtitle}>60+ battle-tested one-liners: Recon, PrivEsc, Pivoting & Web</Text>
+            </View>
+          </View>
+          <Text style={styles.cheatSheetArrow}>→</Text>
+        </TouchableOpacity>
+
         {/* Document Cards List */}
         <View style={styles.docList}>
           {filteredDocs.map(doc => (
@@ -475,5 +491,45 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: 'bold',
     letterSpacing: 0.5,
+  },
+  cheatSheetBanner: {
+    backgroundColor: 'rgba(0, 212, 255, 0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(0, 212, 255, 0.5)',
+    borderRadius: 6,
+    padding: 12,
+    marginBottom: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  cheatSheetLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  cheatSheetIcon: {
+    fontSize: 24,
+    marginRight: 10,
+  },
+  cheatSheetTitle: {
+    color: THEME.accent,
+    fontFamily: 'monospace',
+    fontSize: 12,
+    fontWeight: 'bold',
+    letterSpacing: 0.5,
+  },
+  cheatSheetSubtitle: {
+    color: THEME.textDim,
+    fontFamily: 'monospace',
+    fontSize: 10,
+    marginTop: 2,
+  },
+  cheatSheetArrow: {
+    color: THEME.accent,
+    fontFamily: 'monospace',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: 8,
   },
 });
