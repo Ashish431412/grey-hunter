@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { DragonBackground } from '../../components/common/DragonBackground';
+import rawToolDefinitions from '../../features/tools/configs/toolDefinitions.json';
 
 const THEME = {
   background: '#070f1e', // Mythic Dragon Abyss
@@ -11,60 +12,47 @@ const THEME = {
   text: '#ffffff',       // Pure Crisp White
   textMuted: '#8ba8cc',  // Ice Blue Silver
   border: '#163252',
+  borderHighlight: '#00ff66',
   error: '#ff2247',
+  warning: '#ffb703',
 };
 
-const CATEGORIES = ['All', 'Network', 'Recon', 'Web', 'Exploitation', 'Attack', 'Wireless', 'Password', 'Sniffing', 'Forensics'];
+export interface CatalogTool {
+  keyId: string;
+  id: string;
+  name: string;
+  category: string;
+  desc: string;
+  command: string;
+  root: boolean;
+  requiresNetwork: boolean;
+}
 
-const TOOLS = [
-  // ── NETWORK DISCOVERY & SCANNING ──
-  { id: '1',  name: 'Nmap',          category: 'Network',       desc: 'Network mapper & port scanner',             root: false },
-  { id: '2',  name: 'Netdiscover',   category: 'Network',       desc: 'ARP reconnaissance tool for LAN discovery', root: true },
-  { id: '3',  name: 'ARP-Scan',      category: 'Network',       desc: 'ARP request IP scanner for local network',  root: true },
-  { id: '4',  name: 'Masscan',       category: 'Network',       desc: 'Fastest Internet port scanner (async)',      root: true },
-  { id: '5',  name: 'Angry IP',      category: 'Network',       desc: 'Fast network IP address & port scanner',    root: false },
-  // ── RECONNAISSANCE ──
-  { id: '6',  name: 'Amass',         category: 'Recon',         desc: 'Attack surface mapping & asset discovery',   root: false },
-  { id: '7',  name: 'TheHarvester',  category: 'Recon',         desc: 'E-mail, subdomain & name harvester',        root: false },
-  { id: '8',  name: 'Sublist3r',     category: 'Recon',         desc: 'Fast subdomains enumeration tool',           root: false },
-  { id: '9',  name: 'DNSenum',       category: 'Recon',         desc: 'DNS enumeration & zone transfer',            root: false },
-  { id: '10', name: 'Shodan',        category: 'Recon',         desc: 'IoT & exposed device search engine CLI',     root: false },
-  // ── EXPLOITATION & ATTACK ──
-  { id: '11', name: 'Metasploit',    category: 'Exploitation',  desc: 'Penetration testing framework (2315 exploits)', root: false },
-  { id: '12', name: 'SQLMap',        category: 'Attack',        desc: 'Automatic SQL injection & DB takeover tool', root: false },
-  { id: '13', name: 'Hydra',         category: 'Attack',        desc: 'Network logon brute-force (SSH/FTP/HTTP)',   root: false },
-  { id: '14', name: 'Nikto',         category: 'Attack',        desc: 'Web server vulnerability scanner',           root: false },
-  { id: '15', name: 'Commix',        category: 'Attack',        desc: 'OS command injection exploiter',             root: false },
-  { id: '16', name: 'BeEF',          category: 'Attack',        desc: 'Browser Exploitation Framework',             root: false },
-  { id: '17', name: 'Social-Engineer Toolkit', category: 'Attack', desc: 'Social engineering attack platform (SET)', root: false },
-  // ── WEB APPLICATION ──
-  { id: '18', name: 'Burp Suite',    category: 'Web',           desc: 'Web vulnerability scanner & proxy',          root: false },
-  { id: '19', name: 'Gobuster',      category: 'Web',           desc: 'Directory/DNS/VHost brute-force tool',       root: false },
-  { id: '20', name: 'OWASP ZAP',     category: 'Web',           desc: 'Web app security scanner (proxy)',           root: false },
-  { id: '21', name: 'Wfuzz',         category: 'Web',           desc: 'Web application fuzzer',                     root: false },
-  { id: '22', name: 'Nuclei',        category: 'Web',           desc: 'Template-based vulnerability scanner',       root: false },
-  // ── WIRELESS ──
-  { id: '23', name: 'Aircrack-ng',   category: 'Wireless',      desc: 'WiFi security & WPA/WPA2 cracking suite',   root: true },
-  { id: '24', name: 'Wifite',        category: 'Wireless',      desc: 'Automated wireless attack tool',             root: true },
-  { id: '25', name: 'Kismet',        category: 'Wireless',      desc: 'Wireless network detector & sniffer',        root: true },
-  { id: '26', name: 'Reaver',        category: 'Wireless',      desc: 'WPS PIN brute-force attack',                 root: true },
-  // ── PASSWORD CRACKING ──
-  { id: '27', name: 'Hashcat',       category: 'Password',      desc: 'GPU-accelerated password recovery',          root: false },
-  { id: '28', name: 'John the Ripper', category: 'Password',    desc: 'Password hash cracker (CPU)',                root: false },
-  { id: '29', name: 'Medusa',        category: 'Password',      desc: 'Speedy parallel network login auditor',      root: false },
-  { id: '30', name: 'Crunch',        category: 'Password',      desc: 'Custom wordlist generator',                  root: false },
-  // ── SNIFFING & MITM ──
-  { id: '31', name: 'Wireshark',     category: 'Sniffing',      desc: 'Network protocol analyzer & packet capture', root: true },
-  { id: '32', name: 'Ettercap',      category: 'Sniffing',      desc: 'MITM attack & ARP spoofing suite',           root: true },
-  { id: '33', name: 'Bettercap',     category: 'Sniffing',      desc: 'Swiss Army knife for MITM attacks',          root: true },
-  { id: '34', name: 'MITMproxy',     category: 'Sniffing',      desc: 'Interactive HTTPS proxy for MITM',           root: false },
-  { id: '35', name: 'Tcpdump',       category: 'Sniffing',      desc: 'Command-line packet analyzer',               root: true },
-  // ── FORENSICS & POST-EXPLOIT ──
-  { id: '36', name: 'Volatility',    category: 'Forensics',     desc: 'Memory forensics framework',                 root: false },
-  { id: '37', name: 'Autopsy',       category: 'Forensics',     desc: 'Digital forensics platform',                 root: false },
-  { id: '38', name: 'Binwalk',       category: 'Forensics',     desc: 'Firmware analysis & extraction tool',        root: false },
-  { id: '39', name: 'LinPEAS',       category: 'Forensics',     desc: 'Linux privilege escalation audit script',    root: false },
-  { id: '40', name: 'Mimikatz',      category: 'Forensics',     desc: 'Windows credential extraction tool',         root: false },
+// Map all tool definitions from JSON and ensure unique keys
+const ALL_TOOLS: CatalogTool[] = (rawToolDefinitions as any[]).map((tool, index) => ({
+  keyId: `${tool.id}_${tool.category}_${index}`,
+  id: tool.id,
+  name: tool.name,
+  category: tool.category || 'General',
+  desc: tool.description || 'Security assessment and auditing utility.',
+  command: tool.command || tool.id,
+  root: !!tool.requiresRoot,
+  requiresNetwork: !!tool.requiresNetwork,
+}));
+
+const CATEGORIES = [
+  'All',
+  'Network',
+  'Vulnerability',
+  'Exploitation',
+  'Web',
+  'Wireless',
+  'Password',
+  'Sniffing',
+  'Forensics',
+  'Recon',
+  'Crypto',
+  'Audit',
 ];
 
 export const ToolCatalogScreen = ({ navigation }: any) => {
@@ -72,65 +60,232 @@ export const ToolCatalogScreen = ({ navigation }: any) => {
   const [activeCategory, setActiveCategory] = useState('All');
   const [isGrid, setIsGrid] = useState(false);
 
-  const filteredTools = TOOLS.filter(tool => {
-    const matchesSearch = tool.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCat = activeCategory === 'All' || tool.category === activeCategory;
-    return matchesSearch && matchesCat;
-  });
+  // Category counts
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = { All: ALL_TOOLS.length };
+    ALL_TOOLS.forEach(tool => {
+      counts[tool.category] = (counts[tool.category] || 0) + 1;
+    });
+    return counts;
+  }, []);
+
+  const filteredTools = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    return ALL_TOOLS.filter(tool => {
+      const matchesSearch =
+        !q ||
+        tool.name.toLowerCase().includes(q) ||
+        tool.command.toLowerCase().includes(q) ||
+        tool.desc.toLowerCase().includes(q) ||
+        tool.category.toLowerCase().includes(q);
+      const matchesCat = activeCategory === 'All' || tool.category.toLowerCase() === activeCategory.toLowerCase();
+      return matchesSearch && matchesCat;
+    });
+  }, [searchQuery, activeCategory]);
+
+  const renderToolItem = ({ item }: { item: CatalogTool }) => {
+    if (isGrid) {
+      return (
+        <View style={styles.gridCard}>
+          <TouchableOpacity
+            style={styles.gridCardTop}
+            onPress={() => navigation.navigate('ToolDetail', { toolId: item.id })}
+          >
+            <View style={styles.gridHeader}>
+              <View style={styles.liveIndicator} />
+              <Text style={styles.gridToolName} numberOfLines={1}>{item.name}</Text>
+            </View>
+            <Text style={styles.gridCommand} numberOfLines={1}>${item.command}</Text>
+            <View style={styles.gridBadges}>
+              <Text style={styles.gridCategoryBadge}>{item.category.toUpperCase()}</Text>
+              {item.root && <Text style={styles.rootBadgeSmall}>ROOT</Text>}
+            </View>
+            <Text style={styles.gridDesc} numberOfLines={2}>{item.desc}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.gridRunBtn}
+            onPress={() => navigation.navigate('ToolRunner', { tool: item.id, autoRun: true })}
+          >
+            <Text style={styles.gridRunBtnText}>⚡ RUN</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+
+    return (
+      <View style={styles.toolCard}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => navigation.navigate('ToolDetail', { toolId: item.id })}
+        >
+          <View style={styles.cardHeader}>
+            <View style={styles.nameRow}>
+              <View style={styles.liveIndicator} />
+              <Text style={styles.toolName}>{item.name}</Text>
+              <Text style={styles.cmdBadge}>${item.command}</Text>
+            </View>
+
+            <View style={styles.badgeRow}>
+              <View style={styles.readyBadge}>
+                <Text style={styles.readyBadgeText}>⚡ READY</Text>
+              </View>
+              {item.root && <Text style={styles.rootBadge}>ROOT</Text>}
+            </View>
+          </View>
+
+          <View style={styles.metaRow}>
+            <Text style={styles.categoryBadge}>{item.category.toUpperCase()}</Text>
+            <Text style={styles.networkBadge}>
+              {item.requiresNetwork ? 'NET: REQUIRED' : 'NET: LOCAL'}
+            </Text>
+          </View>
+
+          <Text style={styles.toolDesc} numberOfLines={2}>{item.desc}</Text>
+        </TouchableOpacity>
+
+        {/* Action Row */}
+        <View style={styles.actionRow}>
+          <TouchableOpacity
+            style={styles.specsBtn}
+            onPress={() => navigation.navigate('ToolDetail', { toolId: item.id })}
+          >
+            <Text style={styles.specsBtnText}>[ SPECS ]</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.runBtn}
+            onPress={() => navigation.navigate('ToolRunner', { tool: item.id, autoRun: true })}
+          >
+            <Text style={styles.runBtnText}>⚡ RUN TOOL</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
 
   return (
     <DragonBackground overlayOpacity={0.88}>
       <View style={styles.container}>
-        <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="[ SEARCH_TOOLS ]"
-          placeholderTextColor="#555"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-        <TouchableOpacity style={styles.toggleBtn} onPress={() => setIsGrid(!isGrid)}>
-          <Text style={styles.toggleText}>{isGrid ? 'LIST' : 'GRID'}</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.filterContainer}>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          {CATEGORIES.map(cat => (
-            <TouchableOpacity 
-              key={cat} 
-              style={[styles.chip, activeCategory === cat && styles.chipActive]}
-              onPress={() => setActiveCategory(cat)}
-            >
-              <Text style={[styles.chipText, activeCategory === cat && styles.chipTextActive]}>
-                {cat}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
-
-      <FlatList
-        key={isGrid ? 'G' : 'L'}
-        data={filteredTools}
-        numColumns={isGrid ? 2 : 1}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity 
-            style={[styles.toolCard, isGrid && styles.toolCardGrid]}
-            onPress={() => navigation.navigate('ToolDetail', { toolId: item.id })}
-          >
-            <View style={styles.cardHeader}>
-              <Text style={styles.toolName}>{item.name}</Text>
-              {item.root && <Text style={styles.rootBadge}>ROOT</Text>}
+        {/* Status Header Banner */}
+        <View style={styles.statusBanner}>
+          <View style={styles.statusBarLeft}>
+            <View style={styles.liveIndicatorLarge} />
+            <View>
+              <Text style={styles.statusTitle}>ARSENAL // {ALL_TOOLS.length} TOOLS ARMED</Text>
+              <Text style={styles.statusSubtitle}>ALL ENGINES CONFIGURED & READY TO RUN</Text>
             </View>
-            <Text style={styles.categoryBadge}>{item.category}</Text>
-            <Text style={styles.toolDesc} numberOfLines={2}>{item.desc}</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.quickRunHeaderBtn}
+            onPress={() => navigation.navigate('ToolRunner', { tool: 'nmap', autoRun: true })}
+          >
+            <Text style={styles.quickRunHeaderText}>QUICK RUN</Text>
           </TouchableOpacity>
-        )}
-      />
-    </View>
-  </DragonBackground>
+        </View>
+
+        {/* Quick Tools & Utilities Toolbar */}
+        <View style={styles.utilitiesContainer}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <TouchableOpacity
+              style={styles.utilBtn}
+              onPress={() => navigation.navigate('NetworkMap')}
+            >
+              <Text style={styles.utilBtnText}>🗺️ TOPOLOGY</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.utilBtn}
+              onPress={() => navigation.navigate('ExploitDB')}
+            >
+              <Text style={styles.utilBtnText}>🛡️ EXPLOIT DB</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.utilBtn}
+              onPress={() => navigation.navigate('CVSSCalculator')}
+            >
+              <Text style={styles.utilBtnText}>🔢 CVSS 3.1</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.utilBtn}
+              onPress={() => navigation.navigate('PasswordGen')}
+            >
+              <Text style={styles.utilBtnText}>🔑 KEY FORGE</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.utilBtn}
+              onPress={() => navigation.navigate('ScanHistory')}
+            >
+              <Text style={styles.utilBtnText}>📜 HISTORY</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.utilBtn}
+              onPress={() => navigation.navigate('CheatSheet')}
+            >
+              <Text style={styles.utilBtnText}>⚡ CHEAT SHEET</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        </View>
+
+        {/* Search & Layout Toggle */}
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder={`[ SEARCH ${ALL_TOOLS.length} ARSENAL TOOLS... ]`}
+            placeholderTextColor="#556"
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            autoCapitalize="none"
+          />
+          <TouchableOpacity style={styles.toggleBtn} onPress={() => setIsGrid(!isGrid)}>
+            <Text style={styles.toggleText}>{isGrid ? '[ LIST ]' : '[ GRID ]'}</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Category Filter Chips */}
+        <View style={styles.filterContainer}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {CATEGORIES.map(cat => {
+              const count = categoryCounts[cat] || 0;
+              const isActive = activeCategory.toLowerCase() === cat.toLowerCase();
+              return (
+                <TouchableOpacity
+                  key={cat}
+                  style={[styles.chip, isActive && styles.chipActive]}
+                  onPress={() => setActiveCategory(cat)}
+                >
+                  <Text style={[styles.chipText, isActive && styles.chipTextActive]}>
+                    {cat.toUpperCase()} {count > 0 ? `(${count})` : ''}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        </View>
+
+        {/* Tools Count Indicator */}
+        <View style={styles.countBar}>
+          <Text style={styles.countText}>
+            SHOWING {filteredTools.length} OF {ALL_TOOLS.length} TOOLS
+          </Text>
+          <Text style={styles.runHintText}>
+            TAP [⚡ RUN] TO EXECUTE ANY TOOL IN TERMINAL
+          </Text>
+        </View>
+
+        {/* Tools List */}
+        <FlatList
+          key={isGrid ? 'G' : 'L'}
+          data={filteredTools}
+          numColumns={isGrid ? 2 : 1}
+          keyExtractor={item => item.keyId}
+          renderItem={renderToolItem}
+          contentContainerStyle={styles.listContent}
+          initialNumToRender={15}
+          maxToRenderPerBatch={20}
+          windowSize={10}
+        />
+      </View>
+    </DragonBackground>
   );
 };
 
@@ -139,97 +294,368 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'transparent',
   },
+  statusBanner: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 255, 102, 0.06)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0, 255, 102, 0.25)',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
+  statusBarLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  liveIndicatorLarge: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: THEME.primary,
+    marginRight: 10,
+    shadowColor: THEME.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
+  },
+  liveIndicator: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: THEME.primary,
+    marginRight: 6,
+  },
+  statusTitle: {
+    color: THEME.primary,
+    fontFamily: 'monospace',
+    fontSize: 12,
+    fontWeight: 'bold',
+    letterSpacing: 0.5,
+  },
+  statusSubtitle: {
+    color: THEME.textMuted,
+    fontFamily: 'monospace',
+    fontSize: 9,
+    marginTop: 1,
+  },
+  quickRunHeaderBtn: {
+    backgroundColor: 'rgba(0, 212, 255, 0.15)',
+    borderWidth: 1,
+    borderColor: THEME.accent,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 3,
+  },
+  quickRunHeaderText: {
+    color: THEME.accent,
+    fontFamily: 'monospace',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  utilitiesContainer: {
+    paddingVertical: 6,
+    paddingHorizontal: 14,
+    backgroundColor: 'rgba(0, 212, 255, 0.04)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(22, 50, 82, 0.5)',
+  },
+  utilBtn: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    backgroundColor: THEME.surface,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 212, 255, 0.3)',
+    borderRadius: 3,
+    marginRight: 6,
+  },
+  utilBtnText: {
+    color: THEME.accent,
+    fontFamily: 'monospace',
+    fontSize: 9,
+    fontWeight: 'bold',
+  },
   searchContainer: {
     flexDirection: 'row',
-    padding: 15,
+    paddingHorizontal: 14,
+    paddingTop: 12,
+    paddingBottom: 8,
   },
   searchInput: {
     flex: 1,
     backgroundColor: THEME.surface,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: THEME.border,
     color: THEME.text,
-    padding: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     fontFamily: 'monospace',
-    marginRight: 10,
+    fontSize: 12,
+    marginRight: 8,
+    borderRadius: 4,
   },
   toggleBtn: {
     justifyContent: 'center',
-    paddingHorizontal: 15,
+    paddingHorizontal: 12,
     backgroundColor: THEME.surface,
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: THEME.border,
+    borderRadius: 4,
   },
   toggleText: {
     color: THEME.accent,
     fontFamily: 'monospace',
+    fontSize: 11,
+    fontWeight: 'bold',
   },
   filterContainer: {
-    paddingBottom: 15,
-    paddingHorizontal: 15,
+    paddingVertical: 6,
+    paddingHorizontal: 14,
   },
   chip: {
-    paddingHorizontal: 15,
+    paddingHorizontal: 12,
     paddingVertical: 5,
     borderWidth: 1,
-    borderColor: '#333',
-    marginRight: 10,
-    borderRadius: 15,
+    borderColor: THEME.border,
+    backgroundColor: THEME.surface,
+    marginRight: 8,
+    borderRadius: 14,
   },
   chipActive: {
     borderColor: THEME.primary,
-    backgroundColor: 'rgba(0, 255, 65, 0.1)',
+    backgroundColor: 'rgba(0, 255, 102, 0.15)',
   },
   chipText: {
-    color: '#888',
+    color: THEME.textMuted,
     fontFamily: 'monospace',
-    fontSize: 12,
+    fontSize: 10,
   },
   chipTextActive: {
     color: THEME.primary,
+    fontWeight: 'bold',
+  },
+  countBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    backgroundColor: 'rgba(13, 27, 46, 0.5)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(22, 50, 82, 0.6)',
+  },
+  countText: {
+    color: THEME.textMuted,
+    fontFamily: 'monospace',
+    fontSize: 9,
+    fontWeight: 'bold',
+  },
+  runHintText: {
+    color: THEME.primary,
+    fontFamily: 'monospace',
+    fontSize: 8,
+  },
+  listContent: {
+    paddingHorizontal: 14,
+    paddingTop: 10,
+    paddingBottom: 25,
   },
   toolCard: {
     backgroundColor: THEME.card,
-    marginHorizontal: 15,
-    marginBottom: 15,
-    padding: 15,
+    marginBottom: 12,
+    padding: 14,
     borderWidth: 1,
-    borderColor: '#333',
-  },
-  toolCardGrid: {
-    flex: 1,
-    marginHorizontal: 7.5,
+    borderColor: THEME.border,
+    borderRadius: 6,
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 5,
+    marginBottom: 4,
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
   },
   toolName: {
     color: THEME.primary,
     fontFamily: 'monospace',
-    fontSize: 16,
+    fontSize: 15,
+    fontWeight: 'bold',
+    marginRight: 8,
+  },
+  cmdBadge: {
+    color: THEME.textMuted,
+    fontFamily: 'monospace',
+    fontSize: 11,
+  },
+  badgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  readyBadge: {
+    backgroundColor: 'rgba(0, 255, 102, 0.15)',
+    borderWidth: 1,
+    borderColor: THEME.primary,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 3,
+    marginRight: 6,
+  },
+  readyBadgeText: {
+    color: THEME.primary,
+    fontFamily: 'monospace',
+    fontSize: 9,
     fontWeight: 'bold',
   },
   rootBadge: {
-    backgroundColor: THEME.error,
-    color: THEME.background,
-    fontSize: 10,
-    paddingHorizontal: 4,
+    backgroundColor: 'rgba(255, 34, 71, 0.2)',
+    borderWidth: 1,
+    borderColor: THEME.error,
+    color: THEME.error,
+    fontSize: 9,
+    paddingHorizontal: 5,
     paddingVertical: 2,
     fontFamily: 'monospace',
     fontWeight: 'bold',
+    borderRadius: 3,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    marginTop: 2,
   },
   categoryBadge: {
     color: THEME.accent,
     fontFamily: 'monospace',
     fontSize: 10,
-    marginBottom: 10,
+    fontWeight: 'bold',
+    marginRight: 10,
+  },
+  networkBadge: {
+    color: THEME.textMuted,
+    fontFamily: 'monospace',
+    fontSize: 9,
   },
   toolDesc: {
     color: THEME.text,
     fontFamily: 'monospace',
-    fontSize: 12,
+    fontSize: 11,
+    lineHeight: 16,
+    marginBottom: 12,
+  },
+  actionRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(22, 50, 82, 0.8)',
+    paddingTop: 10,
+  },
+  specsBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderWidth: 1,
+    borderColor: THEME.border,
+    backgroundColor: THEME.surface,
+    marginRight: 10,
+    borderRadius: 4,
+  },
+  specsBtnText: {
+    color: THEME.accent,
+    fontFamily: 'monospace',
+    fontSize: 11,
+    fontWeight: 'bold',
+  },
+  runBtn: {
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    backgroundColor: THEME.primary,
+    borderRadius: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  runBtnText: {
+    color: THEME.background,
+    fontFamily: 'monospace',
+    fontSize: 11,
+    fontWeight: 'bold',
+  },
+  // Grid Styles
+  gridCard: {
+    flex: 1,
+    backgroundColor: THEME.card,
+    margin: 5,
+    borderWidth: 1,
+    borderColor: THEME.border,
+    borderRadius: 6,
+    overflow: 'hidden',
+    justifyContent: 'space-between',
+  },
+  gridCardTop: {
+    padding: 10,
+  },
+  gridHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 3,
+  },
+  gridToolName: {
+    color: THEME.primary,
+    fontFamily: 'monospace',
+    fontSize: 13,
+    fontWeight: 'bold',
+    flex: 1,
+  },
+  gridCommand: {
+    color: THEME.textMuted,
+    fontFamily: 'monospace',
+    fontSize: 10,
+    marginBottom: 4,
+  },
+  gridBadges: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  gridCategoryBadge: {
+    color: THEME.accent,
+    fontFamily: 'monospace',
+    fontSize: 9,
+    marginRight: 6,
+  },
+  rootBadgeSmall: {
+    backgroundColor: 'rgba(255, 34, 71, 0.2)',
+    borderWidth: 1,
+    borderColor: THEME.error,
+    color: THEME.error,
+    fontSize: 8,
+    paddingHorizontal: 3,
+    paddingVertical: 1,
+    fontFamily: 'monospace',
+    fontWeight: 'bold',
+    borderRadius: 2,
+  },
+  gridDesc: {
+    color: THEME.text,
+    fontFamily: 'monospace',
+    fontSize: 10,
+    lineHeight: 14,
+  },
+  gridRunBtn: {
+    backgroundColor: THEME.primary,
+    paddingVertical: 7,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  gridRunBtnText: {
+    color: THEME.background,
+    fontFamily: 'monospace',
+    fontSize: 11,
+    fontWeight: 'bold',
   },
 });

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { DragonBackground } from '../../components/common/DragonBackground';
+import rawToolDefinitions from '../../features/tools/configs/toolDefinitions.json';
 
 const THEME = {
   background: '#070f1e', // Mythic Dragon Abyss
@@ -150,35 +151,83 @@ const TOOL_CONFIGS: Record<string, ToolConfig> = {
 const createDynamicToolConfig = (toolName: string): ToolConfig => {
   const cleanName = (toolName || 'tool').toUpperCase();
   const lowerName = (toolName || 'tool').toLowerCase();
+
+  const def = (rawToolDefinitions as any[]).find(
+    (t: any) =>
+      t.id.toLowerCase() === lowerName ||
+      t.name.toLowerCase() === lowerName ||
+      (t.command && t.command.toLowerCase() === lowerName)
+  );
+
+  const displayName = def?.name || cleanName;
+  const commandPrefix = def?.command || lowerName;
+  const category = (def?.category || 'SECURITY').toUpperCase();
+
+  // Smart defaults based on category
+  let defaultTarget = '192.168.1.100';
+  let defaultFlags = '-v';
+  let targetPlaceholder = `[ TARGET IP / RANGE FOR ${displayName} ]`;
+
+  if (category === 'WEB') {
+    defaultTarget = 'http://192.168.1.100';
+    defaultFlags = '-u --depth 2 -v';
+    targetPlaceholder = `[ TARGET URL: e.g. http://192.168.1.100 ]`;
+  } else if (category === 'WIRELESS') {
+    defaultTarget = 'wlan0mon';
+    defaultFlags = '--channel 1-11 --write capture_dump';
+    targetPlaceholder = `[ WIRELESS INTERFACE: e.g. wlan0mon ]`;
+  } else if (category === 'PASSWORD') {
+    defaultTarget = '/usr/share/wordlists/rockyou.txt';
+    defaultFlags = '-m 1000 -a 0';
+    targetPlaceholder = `[ HASH FILE / WORDLIST PATH ]`;
+  } else if (category === 'SNIFFING') {
+    defaultTarget = 'eth0';
+    defaultFlags = '-i eth0 -nn -s 0 -vv';
+    targetPlaceholder = `[ CAPTURE INTERFACE: e.g. eth0 ]`;
+  } else if (category === 'FORENSICS') {
+    defaultTarget = '/mnt/evidence/image.raw';
+    defaultFlags = '--profile=Win10x64_19041 pslist';
+    targetPlaceholder = `[ MEMORY DUMP / FILE PATH ]`;
+  } else if (category === 'RECON') {
+    defaultTarget = 'target.internal';
+    defaultFlags = '-d -active -v';
+    targetPlaceholder = `[ DOMAIN / TARGET HOST ]`;
+  } else if (category === 'EXPLOITATION' || category === 'ATTACK') {
+    defaultTarget = '192.168.1.100';
+    defaultFlags = '-RHOSTS 192.168.1.100 -LHOST 10.8.0.4';
+    targetPlaceholder = `[ REMOTE TARGET HOST ]`;
+  }
+
   return {
-    name: `${cleanName} // EXECUTION ENGINE`,
-    defaultTarget: '192.168.1.100',
-    defaultFlags: '-v --timing 4',
-    targetPlaceholder: `[ TARGET IP / DOMAIN / URL FOR ${cleanName} ]`,
-    cmdPrefix: lowerName,
+    name: `${displayName.toUpperCase()} // ${category} ENGINE`,
+    defaultTarget,
+    defaultFlags,
+    targetPlaceholder,
+    cmdPrefix: commandPrefix,
     generateOutput: (target, flags) => [
-      `[*] Initializing ${cleanName} v2.4 (Dragon Engine)...`,
-      `[*] Parameters: ${flags}`,
-      `[*] Target: ${target}`,
+      `[*] Initializing ${displayName} (Dragon Terminal Engine)...`,
+      `[*] Binary: ${commandPrefix} | Flags: ${flags}`,
+      `[*] Target Parameter: ${target}`,
       `[*] Establishing execution telemetry channel...`,
-      `[+] Scanning target surface: ${target}`,
-      `[+] Connecting through authenticated tunnel (10.8.0.4)...`,
+      `[+] Loading modules and vulnerability databases...`,
       `-------------------------------------------------------------------`,
-      `[+] Probing target endpoints and response headers...`,
-      `[+] Analysis module [active]: inspecting services on ${target}`,
-      `[+] Target response received: HTTP/1.1 200 OK | Host online`,
-      `[+] Discovered active listener at port 80/tcp (http)`,
-      `[+] Discovered active listener at port 443/tcp (https/tls)`,
-      `[+] Telemetry analysis completed without exceptions`,
+      `[+] Target response acknowledged: Host reachable`,
+      `[+] Initiating audit phase on ${target}...`,
+      `[+] Probing communication channels & service endpoints...`,
+      `[+] Module [active]: analyzing payload responses...`,
+      `[+] Service banner captured: Service listening on endpoint`,
+      `[+] Auditing security configurations and posture...`,
+      `[+] Telemetry integrity verified. 0 anomalies detected.`,
       `-------------------------------------------------------------------`,
-      `[✓] ${cleanName} payload execution completed. 0 fatal errors.`,
-      `[i] Audit record preserved in local operation vault.`,
+      `[✓] ${displayName} execution successfully completed.`,
+      `[i] Audit telemetry archived to local operation vault.`,
     ],
   };
 };
 
 export const ToolRunnerScreen = ({ navigation, route }: any) => {
   const rawParam = route?.params?.tool;
+  const autoRunParam = route?.params?.autoRun;
   const toolKey = (typeof rawParam === 'string' ? rawParam : rawParam?.name || rawParam?.id || 'nmap').toLowerCase();
   const config = TOOL_CONFIGS[toolKey] || createDynamicToolConfig(toolKey);
 
@@ -188,25 +237,13 @@ export const ToolRunnerScreen = ({ navigation, route }: any) => {
   const [output, setOutput] = useState('');
   const timerRef = useRef<any>(null);
 
-  useEffect(() => {
-    setTarget(config.defaultTarget);
-    setFlags(config.defaultFlags);
-    setOutput('');
-    setIsRunning(false);
-  }, [toolKey]);
-
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, []);
-
-  const handleExecute = () => {
+  const executeScan = (targetVal: string, flagsVal: string) => {
+    if (timerRef.current) clearInterval(timerRef.current);
     setIsRunning(true);
-    const resolvedTarget = target.trim() || config.defaultTarget;
-    setOutput(`[+] Launching ${config.cmdPrefix} ${flags} ${resolvedTarget}\n\n`);
+    const resolvedTarget = targetVal.trim() || config.defaultTarget;
+    setOutput(`[+] Launching ${config.cmdPrefix} ${flagsVal} ${resolvedTarget}\n\n`);
 
-    const lines = config.generateOutput(resolvedTarget, flags);
+    const lines = config.generateOutput(resolvedTarget, flagsVal);
     let index = 0;
 
     timerRef.current = setInterval(() => {
@@ -214,10 +251,14 @@ export const ToolRunnerScreen = ({ navigation, route }: any) => {
         setOutput(prev => prev + lines[index] + '\n');
         index++;
       } else {
-        clearInterval(timerRef.current);
+        if (timerRef.current) clearInterval(timerRef.current);
         setIsRunning(false);
       }
-    }, 400);
+    }, 350);
+  };
+
+  const handleExecute = () => {
+    executeScan(target, flags);
   };
 
   const handleAbort = () => {
@@ -225,6 +266,26 @@ export const ToolRunnerScreen = ({ navigation, route }: any) => {
     setIsRunning(false);
     setOutput(prev => prev + '\n[!] PROCESS ABORTED BY USER (SIGINT / CTRL+C)\n');
   };
+
+  useEffect(() => {
+    setTarget(config.defaultTarget);
+    setFlags(config.defaultFlags);
+    setOutput('');
+    setIsRunning(false);
+
+    if (autoRunParam) {
+      const timer = setTimeout(() => {
+        executeScan(config.defaultTarget, config.defaultFlags);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [toolKey, autoRunParam]);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
 
   return (
     <DragonBackground overlayOpacity={0.88}>

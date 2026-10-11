@@ -13,7 +13,7 @@ export type AuthStackParamList = {
 export type ToolsStackParamList = {
   ToolCatalog: undefined;
   ToolDetail: { toolId: string };
-  ToolRunner: { tool: Tool };
+  ToolRunner: { tool: Tool | string; autoRun?: boolean };
   ScanResults: { resultId: string };
   NetworkMap: undefined;
   ExploitDB: undefined;

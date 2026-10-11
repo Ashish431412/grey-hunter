@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { DragonBackground } from '../../components/common/DragonBackground';
+import rawToolDefinitions from '../../features/tools/configs/toolDefinitions.json';
 
 const THEME = {
   background: '#070f1e', // Mythic Dragon Abyss
@@ -227,13 +228,55 @@ const TOOL_ALIASES: Record<string, string> = {
   ettercap: '32',
 };
 
-// Fallback for tools not in detailed DB
+// Fallback and dynamic lookup for all 62 tools
 const getToolData = (toolId: string) => {
   const normalized = (toolId || '1').toLowerCase().trim();
   const resolvedId = TOOL_ALIASES[normalized] || normalized;
 
-  if (TOOL_DB[resolvedId]) return TOOL_DB[resolvedId];
+  if (TOOL_DB[resolvedId]) return { ...TOOL_DB[resolvedId], id: resolvedId };
+
+  // Look up in comprehensive tool definitions
+  const def = (rawToolDefinitions as any[]).find(
+    (t: any) =>
+      t.id.toLowerCase() === normalized ||
+      t.id.toLowerCase() === resolvedId ||
+      t.name.toLowerCase() === normalized ||
+      (t.command && t.command.toLowerCase() === normalized)
+  );
+
+  if (def) {
+    const flags = (def.parameters || []).map((p: any) => ({
+      flag: p.options ? `--${p.name} [${p.options.join('|')}]` : `--${p.name} <${p.type}>`,
+      desc: `${p.description}${p.default !== undefined ? ` (Default: ${p.default})` : ''}`,
+    }));
+    if (flags.length === 0) {
+      flags.push({ flag: '-h / --help', desc: 'Display command usage and options' });
+      flags.push({ flag: '-v / --verbose', desc: 'Enable detailed output logging' });
+    }
+
+    return {
+      id: def.id,
+      name: def.name.toUpperCase(),
+      version: 'v2.4.0',
+      category: `${def.category.toUpperCase()}_ENGINE`,
+      icon: def.name.slice(0, 2).toUpperCase(),
+      overview: def.description,
+      requirements: [
+        `Network: ${def.requiresNetwork ? 'Active Network Connection Required' : 'Local Host / Standalone'}`,
+        `Privileges: ${def.requiresRoot ? 'Root Access Required (UID 0 / sudo)' : 'Standard User (Non-root)'}`,
+        `Binary Command: ${def.command}`,
+      ],
+      usage: `${def.command} [options] <target>`,
+      flags,
+      examples: [
+        { title: `Audit execution with ${def.name}`, cmd: `${def.command} ${def.parameters?.[0] ? `--${def.parameters[0].name} target` : '--help'}` },
+        { title: 'Interactive verbosity scan', cmd: `${def.command} -v 192.168.1.1` },
+      ],
+    };
+  }
+
   return {
+    id: normalized,
     name: normalized.toUpperCase(),
     version: 'latest',
     category: 'SECURITY_MODULE',
@@ -285,7 +328,7 @@ export const ToolDetailScreen = ({ navigation, route }: any) => {
           <View>
             <Text style={styles.bodyText}>{tool.overview}</Text>
             <Text style={styles.sectionTitle}>// REQUIREMENTS</Text>
-            {tool.requirements.map((req, i) => (
+            {tool.requirements.map((req: string, i: number) => (
               <Text key={i} style={styles.bodyText}>• {req}</Text>
             ))}
           </View>
@@ -295,7 +338,7 @@ export const ToolDetailScreen = ({ navigation, route }: any) => {
           <View>
             <Text style={styles.codeBlock}>{tool.usage}</Text>
             <Text style={styles.sectionTitle}>// FLAGS & OPTIONS</Text>
-            {tool.flags.map((f, i) => (
+            {tool.flags.map((f: { flag: string; desc: string }, i: number) => (
               <View key={i} style={styles.tableRow}>
                 <Text style={styles.cellKey}>{f.flag}</Text>
                 <Text style={styles.cellValue}>{f.desc}</Text>
@@ -306,7 +349,7 @@ export const ToolDetailScreen = ({ navigation, route }: any) => {
 
         {activeTab === 'EXAMPLES' && (
           <View>
-            {tool.examples.map((ex, i) => (
+            {tool.examples.map((ex: { title: string; cmd: string }, i: number) => (
               <View key={i} style={styles.exampleCard}>
                 <Text style={styles.exampleDesc}>{ex.title}</Text>
                 <Text style={styles.codeBlock}>{ex.cmd}</Text>
@@ -319,9 +362,9 @@ export const ToolDetailScreen = ({ navigation, route }: any) => {
       <View style={styles.footer}>
         <TouchableOpacity 
           style={styles.launchBtn}
-          onPress={() => navigation.navigate('ToolRunner', { tool: tool.name.toLowerCase() })}
+          onPress={() => navigation.navigate('ToolRunner', { tool: tool.id || tool.name.toLowerCase(), autoRun: true })}
         >
-          <Text style={styles.launchBtnText}>INITIALIZE_TOOL</Text>
+          <Text style={styles.launchBtnText}>⚡ INITIALIZE & RUN TOOL</Text>
         </TouchableOpacity>
       </View>
     </View>
