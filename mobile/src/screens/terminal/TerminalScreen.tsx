@@ -270,16 +270,16 @@ export const TerminalScreen = () => {
 
       case 'tools':
         pushOutput(
-          'GREY HUNTER ARSENAL (40 TOOLS REGISTERED):\n' +
-          ' [RECON]          Nmap, Masscan, Amass, Sublist3r, DNSenum, TheHarvester\n' +
-          ' [NETWORK]        Netdiscover, ARP-Scan, Angry IP, Masscan\n' +
-          ' [VULN SCAN]      Nikto, OpenVAS, Nuclei, Wapiti, OWASP ZAP\n' +
-          ' [ATTACK/EXPLOIT] Metasploit, SQLMap, Hydra, Commix, BeEF, SET\n' +
+          'GREY HUNTER ARSENAL (61 TOOLS REGISTERED):\n' +
+          ' [NETWORK]        Nmap, Netdiscover, ARP-Scan, Masscan, Angry IP, Netcat, hping3, Ping, Traceroute, Responder, Rustscan\n' +
+          ' [RECON]          Amass, Subfinder, TheHarvester, Sublist3r, DNSenum, Shodan, WhatWeb, DNSRecon, BloodHound, Recon-ng, SpiderFoot\n' +
+          ' [VULN SCAN]      Nikto, OpenVAS, Nuclei, WPScan, Wapiti, OWASP ZAP, SSLScan\n' +
+          ' [EXPLOITATION]    Metasploit, SQLMap, Hydra, Commix, BeEF, SET, SearchSploit, CrackMapExec, Certipy, Impacket\n' +
           ' [WIRELESS]       Aircrack-ng, Wifite, Kismet, Reaver\n' +
           ' [SNIFFING]       Wireshark, Tcpdump, Ettercap, Bettercap, MITMproxy\n' +
           ' [PASSWORD]       Hydra, John the Ripper, Hashcat, Medusa, Crunch\n' +
-          ' [WEB APP]        Burp Suite, Gobuster, Dirb, Wfuzz\n' +
-          ' [FORENSICS]      Volatility, Autopsy, Binwalk, LinPEAS, Mimikatz'
+          ' [WEB APP]        Burp Suite, Gobuster, Dirb, Wfuzz, ffuf, Feroxbuster\n' +
+          ' [POST-EXPLOIT]   LinPEAS, WinPEAS, TruffleHog, Volatility, Autopsy, Binwalk, Mimikatz, Foremost'
         );
         break;
 

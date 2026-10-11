@@ -147,9 +147,40 @@ const TOOL_CONFIGS: Record<string, ToolConfig> = {
   },
 };
 
+const createDynamicToolConfig = (toolName: string): ToolConfig => {
+  const cleanName = (toolName || 'tool').toUpperCase();
+  const lowerName = (toolName || 'tool').toLowerCase();
+  return {
+    name: `${cleanName} // EXECUTION ENGINE`,
+    defaultTarget: '192.168.1.100',
+    defaultFlags: '-v --timing 4',
+    targetPlaceholder: `[ TARGET IP / DOMAIN / URL FOR ${cleanName} ]`,
+    cmdPrefix: lowerName,
+    generateOutput: (target, flags) => [
+      `[*] Initializing ${cleanName} v2.4 (Dragon Engine)...`,
+      `[*] Parameters: ${flags}`,
+      `[*] Target: ${target}`,
+      `[*] Establishing execution telemetry channel...`,
+      `[+] Scanning target surface: ${target}`,
+      `[+] Connecting through authenticated tunnel (10.8.0.4)...`,
+      `-------------------------------------------------------------------`,
+      `[+] Probing target endpoints and response headers...`,
+      `[+] Analysis module [active]: inspecting services on ${target}`,
+      `[+] Target response received: HTTP/1.1 200 OK | Host online`,
+      `[+] Discovered active listener at port 80/tcp (http)`,
+      `[+] Discovered active listener at port 443/tcp (https/tls)`,
+      `[+] Telemetry analysis completed without exceptions`,
+      `-------------------------------------------------------------------`,
+      `[✓] ${cleanName} payload execution completed. 0 fatal errors.`,
+      `[i] Audit record preserved in local operation vault.`,
+    ],
+  };
+};
+
 export const ToolRunnerScreen = ({ navigation, route }: any) => {
-  const toolKey = (route?.params?.tool || 'nmap').toLowerCase();
-  const config = TOOL_CONFIGS[toolKey] || TOOL_CONFIGS.nmap;
+  const rawParam = route?.params?.tool;
+  const toolKey = (typeof rawParam === 'string' ? rawParam : rawParam?.name || rawParam?.id || 'nmap').toLowerCase();
+  const config = TOOL_CONFIGS[toolKey] || createDynamicToolConfig(toolKey);
 
   const [target, setTarget] = useState(config.defaultTarget);
   const [flags, setFlags] = useState(config.defaultFlags);
